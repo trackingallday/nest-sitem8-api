@@ -13,6 +13,7 @@
     "seed": "ts-node src/main-utils.ts",
     "start:prod": "node dist/main.js",
     "lint": "tslint -p tsconfig.json -c tslint.json",
+    "lint-fix": "tslint --fix *.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
