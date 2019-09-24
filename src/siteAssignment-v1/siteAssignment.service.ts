@@ -4,9 +4,9 @@ import { SiteAssignment } from './siteAssignment.entity';
 import { SiteAssignmentInterface } from './siteAssignment.interface';
 import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
 import { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
-import WorkerAssignmentDto from 'src/workerAssignment/workerAssignment.dto';
+import WorkerAssignmentDto from './node_modules/src/workerAssignment/workerAssignment.dto';
 import { WorkerAssignmentStatus } from '../common/enums';
-
+import rawdb from '../common/rawdatabase';
 
 @Injectable()
 export class SiteAssignmentService {
@@ -46,12 +46,12 @@ export class SiteAssignmentService {
   async getBlockedSiteIdsByWorkerId(workerId: number): Promise<any[]> {
     const sql = `
       SELECT SiteId
-      FROM workerassignment wa join siteassignment sa
-        ON wa.site_assignment_id = sa.site_assignment_id
-      WHERE wa.worker_id = ${workerId} and sa.archived = 0
-        and not wa.assigned_status = 0;
+      FROM WorkerAssignment wa join SiteAssignment sa
+        ON wa.siteAssignmentId = sa.siteAssignmentId
+      WHERE wa.WorkerId = ${workerId} and sa.archived = 0
+        and not wa.assignedStatus = 0;
     `;
-    return await this.SITEASSIGNMENT_REPOSITORY.sequelize.query(sql, { raw: true });
+    return await rawdb.query(sql, { raw: true });
   }
 
 }

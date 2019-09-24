@@ -32,11 +32,15 @@ export class WorkerService {
     return await this.WORKER_REPOSITORY.findByPk<Worker>(id);
   }
 
-  async updateWorker(id: number, workerProps: any): Promise<Worker> {
-    const worker = await this.findById(workerProps);
-    worker.set(workerProps);
+  async updateOne(id:number, props: any): Promise<Worker> {
+    const worker = await this.findById(props);
+    worker.set(props);
     await worker.save();
     return worker;
+  }
+
+  async updateWorker(id: number, props: any): Promise<Worker> {
+    return this.updateOne(id, props);
   }
 
   async getEnabledSupervisors(companyId: number): Promise<Worker[]> {

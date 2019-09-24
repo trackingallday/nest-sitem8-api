@@ -18,7 +18,7 @@ export default {
       port: 5342,
       username: 'site-m8',
       password: 'sitemateapi',
-      database: 'site-m8',
+      database: 'sitem8-api',
     },
   },
   repositories: {

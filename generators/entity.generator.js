@@ -17,7 +17,7 @@ module.exports = function(extractedModel) {
   return `
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
+@Table(({ tableName: '${name}', modelName: '${name}', underscored: true }))
 export class ${capitalise(name)} extends Model<${capitalise(name)}> {
 ${attrstr}
 }

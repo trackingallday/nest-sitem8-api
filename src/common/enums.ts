@@ -1,4 +1,6 @@
-export class WorkerAssignmentStatus {
-  blocked = 0;
-  assigned = 1;
+export const WorkerAssignmentStatus = {
+  blocked: 0,
+  assigned: 1,
 }
+
+

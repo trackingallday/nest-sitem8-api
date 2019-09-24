@@ -1,7 +1,7 @@
 
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
+@Table({ tableName: 'notification', modelName: 'notification', underscored: true })
 export class Notification extends Model<Notification> {
 
   @Column(DataType.INTEGER)

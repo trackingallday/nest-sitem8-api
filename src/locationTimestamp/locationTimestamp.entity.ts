@@ -1,7 +1,7 @@
 
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
-@Table
+@Table({ tableName: 'locationtimestamp', modelName: 'locationtimestamp', underscored: true })
 export class LocationTimestamp extends Model<LocationTimestamp> {
 
   @Column(DataType.INTEGER)
