@@ -6,7 +6,6 @@ import { Worker } from './worker.entity';
 import WorkerDto from './worker.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
-
 @Controller('workers')
 export class WorkerController {
 
@@ -14,7 +13,7 @@ export class WorkerController {
 
   @Get()
   async findAll(@Req() req): Promise<Worker[]> {
-    console.log(req.user, '******************************')
+    console.log(req.user, '******************************');
     return this.workerService.findAllWhere({ where: { companyId: req.dbUser.companyId }});
   }
 
@@ -39,4 +38,3 @@ export class WorkerController {
     return thisWorker;
   }
 }
-

@@ -2,7 +2,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Worker } from './worker.entity';
 import { WorkerInterface } from './worker.interface';
-import constants from '../constants'
+import constants from '../constants';
 
 @Injectable()
 export class WorkerService {
@@ -13,12 +13,12 @@ export class WorkerService {
     return await this.WORKER_REPOSITORY.findAll<Worker>();
   }
 
-  //AddWorker
+  // AddWorker
   async create(props: WorkerInterface): Promise<Worker> {
     return await this.WORKER_REPOSITORY.create<Worker>(props);
   }
 
-  //GetAllUsersAllCompanies
+  // GetAllUsersAllCompanies
   async findAllWhere(props): Promise<Worker[]> {
     return await this.WORKER_REPOSITORY.findAll<Worker>(props);
   }
@@ -27,12 +27,12 @@ export class WorkerService {
     return await this.WORKER_REPOSITORY.findOne<Worker>(props);
   }
 
-  //GetWorker GetWorkerAnyCompany
+  // GetWorker GetWorkerAnyCompany
   async findById(id): Promise<Worker> {
     return await this.WORKER_REPOSITORY.findByPk<Worker>(id);
   }
 
-  async updateOne(id:number, props: any): Promise<Worker> {
+  async updateOne(id: number, props: any): Promise<Worker> {
     const worker = await this.findById(props);
     worker.set(props);
     await worker.save();
@@ -52,7 +52,11 @@ export class WorkerService {
     return await this.findOneWhere({ deviceId });
   }
 
-  //GetAllUsers
+  async getWorkerByCompanyIdAndWorkerId(companyId: number, workerId: number): Promise<Worker> {
+    return await this.findOneWhere({ companyId, workerId });
+  }
+
+  // GetAllUsers
   async getWorkersByCompany(companyId: number): Promise<Worker[]> {
     return await this.findAllWhere({ companyId });
   }
@@ -66,5 +70,3 @@ export class WorkerService {
   }
 
 }
-
-

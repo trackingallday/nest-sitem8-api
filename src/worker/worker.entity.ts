@@ -1,5 +1,7 @@
 
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Notification } from '../notification/notification.entity';
+import { Company } from '../company/company.entity';
 
 @Table({ tableName: 'worker', modelName: 'worker', underscored: true })
 export class Worker extends Model<Worker> {
@@ -43,9 +45,6 @@ export class Worker extends Model<Worker> {
   @Column(DataType.STRING)
   deviceId: string;
 
-  @Column(DataType.INTEGER)
-  companyId: number;
-
   @Column(DataType.STRING)
   authId: string;
 
@@ -55,5 +54,13 @@ export class Worker extends Model<Worker> {
   @Column(DataType.BOOLEAN)
   isSuperAdministrator: boolean;
 
-}
+  @HasMany(() => Notification)
+  notifications: Notification[];
 
+  @ForeignKey(() => Company)
+  @Column(DataType.INTEGER)
+  companyId: number;
+
+  @BelongsTo(() => Company)
+  company: Company;
+}

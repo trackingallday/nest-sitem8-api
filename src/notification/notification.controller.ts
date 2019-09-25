@@ -5,7 +5,6 @@ import { Notification } from './notification.entity';
 import NotificationDto from './notification.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
-
 @Controller('notification')
 export class NotificationController {
 
@@ -35,5 +34,11 @@ export class NotificationController {
     await thisNotification.save();
     return thisNotification;
   }
-}
 
+  // TODO:
+  @Get('/:id')
+  async getNotifications(@Param() id: number): Promise<Notification> {
+
+  }
+
+}

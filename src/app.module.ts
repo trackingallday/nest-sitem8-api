@@ -18,8 +18,6 @@ import { TimesheetController } from './timesheet/timesheet.controller';
 import { CompanyController } from './company/company.controller';
 import { WorkerAssignmentController } from './workerAssignment/workerAssignment.controller';
 
-
-
 @Module({
   imports: [
     ItemsModule, SiteModule, TimesheetEntryModule,
@@ -36,7 +34,7 @@ export class AppModule {
     consumer
       .apply(AuthenticationMiddleware, DbUserMiddleware)
       .exclude({ path: '/', method: RequestMethod.ALL })
-      .forRoutes(WorkerController, ItemsController)
+      .forRoutes(WorkerController, ItemsController);
   }
 
 }

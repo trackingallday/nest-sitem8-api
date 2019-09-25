@@ -1,5 +1,6 @@
 
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Worker } from '../worker/worker.entity';
 
 @Table({ tableName: 'notification', modelName: 'notification', underscored: true })
 export class Notification extends Model<Notification> {
@@ -7,8 +8,12 @@ export class Notification extends Model<Notification> {
   @Column(DataType.INTEGER)
   notificationId: number;
 
+  @ForeignKey(() => Worker)
   @Column(DataType.INTEGER)
   workerId: number;
+
+  @BelongsTo(() => Worker)
+  worker: Worker;
 
   @Column(DataType.DATE)
   creationDateTime: Date;
@@ -38,4 +43,3 @@ export class Notification extends Model<Notification> {
   emailAddress: string;
 
 }
-
