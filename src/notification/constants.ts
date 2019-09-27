@@ -15,4 +15,4 @@ export const NotificationStatus = {
   Pending: 1,
   Sent: 2,
   Error: -1,
-}, ;
+} ;
