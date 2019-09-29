@@ -1,15 +1,17 @@
 
-import { Get, Post, Body, Param, Controller, UsePipes  } from '@nestjs/common';
+import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { Company } from './company.entity';
 import CompanyDto from './company.dto';
+import { CreateCompanyParams } from './company.interface';
 import { ValidationPipe } from '../common/validation.pipe';
-
+import { WorkerService } from '../worker/worker.service';
 
 @Controller('company')
 export class CompanyController {
 
-  constructor(private readonly companyService: CompanyService) {}
+  constructor(private readonly companyService: CompanyService,
+              private readonly workerService: WorkerService ) {}
 
   @Get()
   async findAll(): Promise<Company[]> {
@@ -35,5 +37,64 @@ export class CompanyController {
     await thisCompany.save();
     return thisCompany;
   }
-}
 
+  @Get('companyname')
+  async GetCompanyName(@Req() req): Promise<string> {
+    const company: Company = await this.companyService.findById( req.dbUser.companyId);
+    return company.name;
+  }
+
+  // Todo
+  // [Route("company/{token}")]
+  // [HttpGet]
+  // [AllowAnonymous]
+  // public ContentResult GetCompany(string token)
+  // {
+  //     var worker = AccessTokenManager.GetWorkerFromAccessToken(token);
+  //     return ToJSON(new CompanyManager(worker).GetCompany());
+  // }
+
+  @Post('updatecompany')
+  @UsePipes(new ValidationPipe())
+  async updateCompany(@Req() req, @Body() company: Company) {
+    company.companyId = req.dbUser.companyId;
+    await this.companyService.updateCompany(company);
+    return true;
+  }
+
+  @Post('createcompany')
+  @UsePipes(new ValidationPipe())
+  async createcompany( @Body() companyParams: CreateCompanyParams) {
+    const company: Company = await this.companyService.addCompany(companyParams.name);
+
+    // TODO:
+    // WorkerManager wm = new WorkerManager(user);
+    // Worker newCompanyAdmin = new Worker();
+    // newCompanyAdmin.Mobile = companyParams.mobile;
+    // newCompanyAdmin.Name = companyParams.name;
+    // newCompanyAdmin.Email = companyParams.email;
+    // newCompanyAdmin.CompanyId = c.CompanyId;
+    // wm.AddCompanyAdministrator(newCompanyAdmin);
+
+    return 'Success';
+  }
+
+  @Get('getcompany')
+  async getCompany(@Req() req): Promise<Company> {
+    return await this.companyService.getCompanyByWorkerId(req.dbUser.companyId);
+  }
+
+  @Get('getcogetallcompaniesmpany')
+  async getAllCompanies(): Promise<Company[]> {
+    return await this.companyService.findAll();
+  }
+
+  @Get('switchcompany/:id')
+  @UsePipes(new ValidationPipe())
+  async switchCompany(@Param() id: number) {
+    // todo:
+    // await this.workerService.switchCompany(LoggedInWorkerId(), id);
+    return true;
+  }
+
+}
