@@ -4,9 +4,6 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 @Table({ tableName: 'locationtimestamp', modelName: 'locationtimestamp', underscored: true })
 export class LocationTimestamp extends Model<LocationTimestamp> {
 
-  @Column(DataType.INTEGER)
-  locationTimestampId: number;
-
   @Column(DataType.STRING)
   deviceId: string;
 
@@ -42,9 +39,6 @@ export class LocationTimestamp extends Model<LocationTimestamp> {
 
   @Column(DataType.BOOLEAN)
   sosButton: boolean;
-
-  @Column(DataType.INTEGER)
-  signalStrength: number;
 
   @Column(DataType.FLOAT)
   altitude: number;

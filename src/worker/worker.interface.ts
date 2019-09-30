@@ -1,6 +1,5 @@
 
 export class WorkerInterface {
-  readonly workerId: number;
   readonly name: string;
   readonly mobile: string;
   readonly email: string;
@@ -12,10 +11,9 @@ export class WorkerInterface {
   readonly isWorker: boolean;
   readonly isSupervisor: boolean;
   readonly isAdministrator: boolean;
-  readonly deviceID: string;
+  readonly deviceId: string;
   readonly companyId: number;
   readonly authId: string;
   readonly base64Image: string;
   readonly isSuperAdministrator: boolean;
 }
-  

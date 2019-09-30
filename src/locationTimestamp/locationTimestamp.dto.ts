@@ -3,13 +3,11 @@ import { IsString, IsInt, IsOptional, IsNumber, IsDate, IsBoolean } from 'class-
 
 export default class LocationTimestampDto {
 
-  @IsNumber() readonly locationTimestampId: number;
-
   @IsString() readonly deviceId: string;
 
-  @IsNumber() readonly workerId: number;
+  @IsOptional() readonly workerId: number;
 
-  @IsDate() readonly creationDateTime: Date;
+  @IsOptional() readonly creationDateTime: Date;
 
   @IsNumber() readonly latitude: number;
 
@@ -17,9 +15,9 @@ export default class LocationTimestampDto {
 
   @IsNumber() readonly battery: number;
 
-  @IsNumber() readonly closestSiteId: number;
+  @IsOptional() readonly closestSiteId: number;
 
-  @IsNumber() readonly closestSiteDistance: number;
+  @IsOptional() readonly closestSiteDistance: number;
 
   @IsDate() readonly locationDateTime: Date;
 
@@ -29,11 +27,9 @@ export default class LocationTimestampDto {
 
   @IsBoolean() readonly sosButton: boolean;
 
-  @IsNumber() readonly signalStrength: number;
-
   @IsNumber() readonly altitude: number;
 
-  @IsNumber() readonly companyId: number;
+  @IsOptional() readonly companyId: number;
 
   @IsOptional() readonly geom: any;
 

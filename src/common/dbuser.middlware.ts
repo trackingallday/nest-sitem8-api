@@ -1,10 +1,11 @@
 import { NestMiddleware } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
 import { Worker } from '../worker/worker.entity';
-import constants from '../constants';
 
-const { database, password, provide, username } = constants.db.dev;
-const sequelize = new Sequelize(database, username, password, {
+const { DBDATABASE, DBPASSWORD, DBPROVIDE, DBPOSTGRESUSERNAME, DBDIALECT, DBHOST, DBPORT } = process.env;
+
+console.log( DBDATABASE, DBPASSWORD, DBPROVIDE, DBPOSTGRESUSERNAME, DBDIALECT, DBHOST, DBPORT)
+const sequelize = new Sequelize(DBDATABASE, DBPOSTGRESUSERNAME, DBPASSWORD, {
   dialect: 'postgres',
 });
 sequelize.addModels([
