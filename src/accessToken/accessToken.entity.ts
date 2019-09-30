@@ -14,4 +14,3 @@ export class AccessToken extends Model<AccessToken> {
   accessTokenId: string;
 
 }
-
