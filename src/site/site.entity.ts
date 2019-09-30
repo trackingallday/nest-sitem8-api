@@ -4,9 +4,6 @@ import { Table, Column, Model, DataType, TableOptions } from 'sequelize-typescri
 @Table({ tableName: 'site', modelName: 'site', underscored: true })
 export class Site extends Model<Site> {
 
-  @Column(DataType.INTEGER)
-  siteId: number;
-
   @Column(DataType.STRING)
   name: string;
 

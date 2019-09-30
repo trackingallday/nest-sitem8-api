@@ -12,5 +12,6 @@ import { DatabaseModule } from '../db/database.module';
     SiteAssignmentService,
     ...SiteAssignmentProvider,
   ],
+  exports: [SiteAssignmentService],
 })
 export class SiteAssignmentModule {}

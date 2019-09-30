@@ -11,21 +11,22 @@ import { Timesheet } from '../timesheet/timesheet.entity';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
 import { Worker } from '../worker/worker.entity';
 import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
+import { Company } from '../company/company.entity';
 import constants from '../constants';
 import defineModelRelationships from './defineModelRelationships';
 
-const { database, password, provide, username } = constants.db.dev;
-
-// defineModelRelationships();
+const { DBDATABASE, DBPASSWORD, DBPROVIDE, DBPOSTGRESUSERNAME, DBDIALECT, DBHOST, DBPORT } = process.env;
 
 export const databaseProviders = [
   {
-    provide,
+    provide: DBPROVIDE,
     useFactory: async () => {
-      const sequelize = new Sequelize(database, username, password, {
+      const sequelize = new Sequelize(DBDATABASE, DBPOSTGRESUSERNAME, DBPASSWORD, {
         dialect: 'postgres',
+        logging: false,
       });
       sequelize.addModels([
+        Company,
         Item,
         AccessToken,
         DayOfWeekTimeSetting,

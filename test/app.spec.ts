@@ -1,6 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../src/app.module';
+
+beforeAll(() => {
+  expect('a').toBe('a');
+  console.log('a is a ');
+});
+
+afterAll(() => {
+  expect('b').toBe('b');
+  console.log('b is b ');
+});
 
 describe('AppController (e2e)', () => {
   let app;

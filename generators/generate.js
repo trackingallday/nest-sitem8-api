@@ -15,13 +15,6 @@ fs.readFile(filePath, 'utf8', (err, data) => {
   if (err) throw err;
   const model = extractModelFromMSSQL(data);
   const folderName = `${model.name}-${new Date().toDateString()}`;
-  console.log(genEntity(model));
-  console.log(genInterface(model));
-  console.log(genService(model));
-  console.log(genDto(model));
-  console.log(genModule(model));
-  console.log(genProvider(model));
-  console.log(genController(model));
   fs.mkdirSync(`${__dirname}/generated_files/${folderName}`);
   write(`${model.name}.entity.ts`, folderName, genEntity(model));
   write(`${model.name}.interface.ts`, folderName, genInterface(model));
@@ -30,7 +23,6 @@ fs.readFile(filePath, 'utf8', (err, data) => {
   write(`${model.name}.provider.ts`, folderName, genProvider(model));
   write(`${model.name}.service.ts`, folderName, genService(model));
   write(`${model.name}.controller.ts`, folderName, genController(model));
-  console.log('done');
 });
 
 function write(name, folder, content) {

@@ -39,22 +39,26 @@ export class SiteService {
     return item;
   }
 
-  async getClosestAssignedSite(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<any> {
+  async getClosestAssignedSiteId(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<any> {
+
     const sql = `
-      SELECT * from site
-      WHERE NOT (site.id = ANY ARRAY[${excludedIds.toString()}])
-        AND site.companyId = ${companyId}
+      SELECT id from site
+      WHERE id NOT IN (${excludedIds.length ? excludedIds.join(",") : 0})
+        AND company_id = ${companyId}
       ORDER BY ST_DISTANCE(site.geom, ST_MakePoint(${lon}, ${lat})) ASC
       LIMIT 1;
     `;
+
     return await this.SITE_REPOSITORY.sequelize.query(sql, { raw: false });
   }
 
   async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<any> {
+    console.log(JSON.stringify(siteId), '*************************************************');
     const sql = `
       SELECT ST_DISTANCE(site.geom, ST_MakePoint(${lon}, ${lat}))
-      FROM site where siteId = ${siteId};
+      FROM site where site.id = ${siteId};
     `
+    console.log(sql);
     return await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
   }
 

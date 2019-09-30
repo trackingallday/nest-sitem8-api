@@ -12,5 +12,6 @@ import { DatabaseModule } from '../db/database.module';
     WorkerService,
     ...WorkerProvider,
   ],
+  exports: [WorkerService]
 })
 export class WorkerModule {}

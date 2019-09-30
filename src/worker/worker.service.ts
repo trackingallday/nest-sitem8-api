@@ -1,5 +1,6 @@
 
 import { Injectable, Inject } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { Worker } from './worker.entity';
 import { WorkerInterface } from './worker.interface';
 import constants from '../constants'
@@ -18,7 +19,7 @@ export class WorkerService {
     return await this.WORKER_REPOSITORY.create<Worker>(props);
   }
 
-  //GetAllUsersAllCompanies
+  //GetAllUsersAllCompanies //GetEnabledSupervisors
   async findAllWhere(props): Promise<Worker[]> {
     return await this.WORKER_REPOSITORY.findAll<Worker>(props);
   }
@@ -33,9 +34,8 @@ export class WorkerService {
   }
 
   async updateOne(id:number, props: any): Promise<Worker> {
-    const worker = await this.findById(props);
-    worker.set(props);
-    await worker.save();
+    const worker = await this.findById(id);
+    await worker.update(props);
     return worker;
   }
 
@@ -44,8 +44,14 @@ export class WorkerService {
   }
 
   async getEnabledSupervisors(companyId: number): Promise<Worker[]> {
-    return await this.findAllWhere(
-      { isEnabled: true, isSupervisor: true, companyId });
+    const params = {
+      where: {
+        isEnabled: true,
+        isSupervisor: true,
+        companyId,
+      }
+    };
+    return await this.findAllWhere(params);
   }
 
   async getWorkerByDeviceId(deviceId: number): Promise<Worker> {
@@ -54,7 +60,7 @@ export class WorkerService {
 
   //GetAllUsers
   async getWorkersByCompany(companyId: number): Promise<Worker[]> {
-    return await this.findAllWhere({ companyId });
+    return await this.findAllWhere({ where: { companyId }});
   }
 
   async switchCompany(workerId: number, companyId: number): Promise<Worker> {
@@ -62,7 +68,7 @@ export class WorkerService {
   }
 
   async getWorkerByAuthId(authId: string): Promise<Worker> {
-    return await this.findOneWhere({ authId });
+    return await this.findOneWhere({ where: { authId }});
   }
 
 }

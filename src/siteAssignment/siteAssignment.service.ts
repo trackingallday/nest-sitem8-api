@@ -45,11 +45,11 @@ export class SiteAssignmentService {
 
   async getBlockedSiteIdsByWorkerId(workerId: number): Promise<any[]> {
     const sql = `
-      SELECT SiteId
-      FROM workerassignment wa join siteassignment sa
-        ON wa.site_assignment_id = sa.site_assignment_id
-      WHERE wa.worker_id = ${workerId} and sa.archived = 0
-        and not wa.assigned_status = 0;
+    SELECT sa.site_id
+    FROM workerassignment wa join siteassignment sa
+      ON wa.site_assignment_id = sa.id
+    WHERE wa.worker_id = ${workerId} and sa.archived = false
+      and not wa.assigned_status = 0;
     `;
     return await this.SITEASSIGNMENT_REPOSITORY.sequelize.query(sql, { raw: true });
   }
