@@ -2,7 +2,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Company } from './company.entity';
 import { CompanyInterface } from './company.interface';
-import moment from '../../node_modules/moment/src/moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class CompanyService {

@@ -2,7 +2,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { TimesheetNote } from './timesheetNote.entity';
 import { TimesheetNoteInterface } from './timesheetNote.interface';
-import moment from '../../node_modules/moment/src/moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class TimesheetNoteService {
@@ -36,7 +36,7 @@ export class TimesheetNoteService {
     }
     // Ensure the timesheet exists and is for correct company.
     await this.findOneWhere({ where: { timesheetId: timesheetNote.timesheetId, companyId }});
-    timesheetNote.creationDateTime = new moment(new Date()).utc();
+    timesheetNote.creationDateTime = moment().utc().toDate();
     await this.TIMESHEETNOTE_REPOSITORY.create<TimesheetNote>(timesheetNote);
     return timesheetNote.timesheetNoteId;
   }

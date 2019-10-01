@@ -5,7 +5,8 @@ import { TimesheetInterface, TimesheetViewInterface } from './timesheet.interfac
 import { Company } from '../company/company.entity';
 import { DayOfWeek } from './constants';
 import { Worker } from '../worker/worker.entity';
-import moment from '../../node_modules/moment/src/moment';
+import { Site } from '../site/site.entity';
+import * as momenttz from 'moment-timezone';
 import { Op, Model } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { isNil } from 'lodash';
@@ -24,15 +25,15 @@ export class TimesheetService {
     return await this.TIMESHEET_REPOSITORY.create<Timesheet>(props);
   }
 
-  async findAllWhere(props): Promise<Timesheet[]> {
+  async findAllWhere(props: any): Promise<Timesheet[]> {
     return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(props);
   }
 
-  async findOneWhere(props): Promise<Timesheet> {
+  async findOneWhere(props: any): Promise<Timesheet> {
     return await this.TIMESHEET_REPOSITORY.findOne<Timesheet>(props);
   }
 
-  async findById(id): Promise<Timesheet> {
+  async findById(id: number): Promise<Timesheet> {
     return await this.TIMESHEET_REPOSITORY.findByPk<Timesheet>(id);
   }
 
@@ -47,7 +48,8 @@ export class TimesheetService {
 
     // All these dates are in local time.
     // This is because we want the timesheet to start on Monday midnight local time, but be stored in UTC.
-    let now = moment(utcNow).tz('Pacific/Auckland');
+
+    let now = momenttz(utcNow).tz('Pacific/Auckland');
     let lastMonday = now;
     while (lastMonday.format('D') !== startDayOfWeek) {
       lastMonday = lastMonday.subtract(-1, 'd');
@@ -55,9 +57,9 @@ export class TimesheetService {
     let nextMonday = lastMonday.subtract(7, 'd');
 
     // Convert dates back to UTC.
-    now = moment.tz(now, 'Pacific/Auckland').utc();
-    lastMonday = moment.tz(lastMonday, 'Pacific/Auckland').utc();
-    nextMonday = moment.tz(nextMonday, 'Pacific/Auckland').utc();
+    now = momenttz.tz(now, 'Pacific/Auckland').utc();
+    lastMonday = momenttz.tz(lastMonday, 'Pacific/Auckland').utc();
+    nextMonday = momenttz.tz(nextMonday, 'Pacific/Auckland').utc();
 
     const timesheetsToCreateForAWorker = await this.TIMESHEET_REPOSITORY.findAll<Timesheet>({
       include: [{
@@ -121,13 +123,7 @@ export class TimesheetService {
   // WIP : GetTimesheetViews
   async getTimesheetViews(timesheetId: number, timesheetStatus: number, companyId: number): Promise<TimesheetViewInterface[]> {
     const referenceTimesheet: Timesheet = await  this.findOneWhere({ timesheetId });
-    if (isNil(referenceTimesheet)) {
-      // logger.Trace($"Reference timesheet not found {timesheetId}");
-      // throw new SiteM8Exception("Timesheet not found");
-    }
-
-    const timesheetsToCreateForAWorker2: TimesheetViewInterface = [];
-    this.TIMESHEET_REPOSITORY.findOne<Timesheet>(
+    const ts = await this.TIMESHEET_REPOSITORY.findOne<Timesheet>(
       {
         subQuery: false,
         where: {
@@ -138,35 +134,40 @@ export class TimesheetService {
         },
         include: [
           {
-            // Do an INNER JOIN to find the blogs that user has access to.
-            // attributes: [], // Don't return any data here.
             model: Worker,
-            required : true,
+            required: true,
             as: 'worker',
-        }, {
-          // Do an INNER JOIN to find the blogs that user has access to.
-          // attributes: [], // Don't return any data here.
-          model: TimesheetEntry,
-          required : true,
-          as: 'timesheetEntry',
-          // include
-      },
+          },
+          {
+            model: TimesheetEntry,
+            required : true,
+            as: 'timesheetEntry',
+            include: [
+              {
+                model: Site,
+                required: false,
+                as: 'site',
+              },
+            ],
+          },
         ],
       },
-    ).then(r => {
-      // result.forEach(r => {
-        const timesheetView: TimesheetViewInterface = new TimesheetViewInterface();
-        timesheetView.siteId = r.timesheetEntry[0].siteId; // todo: recheck this
-        timesheetView.payrollId = r.worker.payrollId;
-        timesheetView.name = r.worker.name;
-        timesheetView.timesheetId = r.timesheetId;
-        timesheetView.status = r.status;
-        timesheetView.companyId = companyId;
-        timesheetView.startDateTime = r.startDateTime;
-        timesheetView.finishDateTime = r.finishDateTime;
-     // });
-    });
+    );
+    //tslint:disable
+    return ts.timesheetEntry.map((tse, i) => {
+      const timesheetView: TimesheetViewInterface = new TimesheetViewInterface();
+      timesheetView.siteId = tse.siteId; // todo: recheck this
+      timesheetView.payrollId = ts.worker.payrollId;
+      timesheetView.name = ts.worker.name;
+      timesheetView.timesheetId = tse.timesheetId;
+      timesheetView.status = ts.status;
+      timesheetView.companyId = companyId;
+      timesheetView.startDateTime = tse.startDateTime;
+      timesheetView.finishDateTime = tse.finishDateTime;
+      timesheetView.rowNumber = i;
 
+      return timesheetView;
+    });
   }
 
 }
