@@ -1,6 +1,7 @@
 
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Timesheet } from '../timesheet/timesheet.entity';
+import { Site } from '../site/site.entity';
 
 @Table({ tableName: 'timesheetentry', modelName: 'timesheetentry', underscored: true })
 export class TimesheetEntry extends Model<TimesheetEntry> {
@@ -17,9 +18,6 @@ export class TimesheetEntry extends Model<TimesheetEntry> {
   @Column(DataType.INTEGER)
   modifiedWorkerId: number;
 
-  @Column(DataType.INTEGER)
-  siteId: number;
-
   @Column(DataType.BOOLEAN)
   travel: boolean;
 
@@ -34,10 +32,16 @@ export class TimesheetEntry extends Model<TimesheetEntry> {
 
   @ForeignKey(() => Timesheet)
   @Column(DataType.INTEGER)
-  @Column(DataType.INTEGER)
   timesheetId: number;
 
   @BelongsTo(() => Timesheet)
   timesheet: Timesheet;
+
+  @ForeignKey(() => Site)
+  @Column(DataType.INTEGER)
+  siteId: number;
+
+  @BelongsTo(() => Site)
+  site: Site;
 
 }

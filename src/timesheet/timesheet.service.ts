@@ -10,6 +10,7 @@ import { Op, Model } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { isNil } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
+import { Site } from '../site/site.entity';
 
 @Injectable()
 export class TimesheetService {
@@ -126,8 +127,8 @@ export class TimesheetService {
       // throw new SiteM8Exception("Timesheet not found");
     }
 
-    const timesheetsToCreateForAWorker2: TimesheetViewInterface = [];
-    this.TIMESHEET_REPOSITORY.findOne<Timesheet>(
+    const timesheetViews = [];
+    const timesheet: Timesheet = await this.TIMESHEET_REPOSITORY.findOne<Timesheet>(
       {
         subQuery: false,
         where: {
@@ -138,35 +139,36 @@ export class TimesheetService {
         },
         include: [
           {
-            // Do an INNER JOIN to find the blogs that user has access to.
-            // attributes: [], // Don't return any data here.
+            attributes: [ 'payrollId', 'name'],
             model: Worker,
             required : true,
             as: 'worker',
         }, {
-          // Do an INNER JOIN to find the blogs that user has access to.
-          // attributes: [], // Don't return any data here.
+          attributes: ['siteId', 'startDateTime', 'finishDateTime', 'site' ],
           model: TimesheetEntry,
           required : true,
           as: 'timesheetEntry',
-          // include
+          include: [ {model: Site, required: true, as: 'Site', attributes: ['name', 'siteId']} ],
       },
         ],
       },
-    ).then(r => {
-      // result.forEach(r => {
+    );
+
+    timesheet.timesheetEntry.forEach(r => {
         const timesheetView: TimesheetViewInterface = new TimesheetViewInterface();
-        timesheetView.siteId = r.timesheetEntry[0].siteId; // todo: recheck this
-        timesheetView.payrollId = r.worker.payrollId;
-        timesheetView.name = r.worker.name;
-        timesheetView.timesheetId = r.timesheetId;
-        timesheetView.status = r.status;
+        timesheetView.siteId = r.siteId; // todo: recheck this
+        timesheetView.payrollId = timesheet.worker.payrollId;
+        timesheetView.name = timesheet.worker.name;
+        timesheetView.timesheetId = timesheet.timesheetId;
+        timesheetView.status = timesheet.status;
         timesheetView.companyId = companyId;
         timesheetView.startDateTime = r.startDateTime;
         timesheetView.finishDateTime = r.finishDateTime;
-     // });
-    });
+        timesheetView.siteName = r.site.name;
 
+        timesheetViews.push(timesheetView);
+    });
+    return timesheetViews;
   }
 
 }
