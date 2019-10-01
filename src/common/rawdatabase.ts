@@ -1,9 +1,9 @@
 import { Sequelize } from 'sequelize-typescript';
 import constants from '../constants';
 
-const { database, password, provide, username } = constants.db.dev;
+const { DBDATABASE, DBPASSWORD, DBPROVIDE, DBPOSTGRESUSERNAME, DBDIALECT, DBHOST, DBPORT } = process.env;
 
-export default new Sequelize(database, username, password, {
+export default new Sequelize(DBDATABASE, DBPOSTGRESUSERNAME, DBPASSWORD, {
   dialect: 'postgres',
 });
 

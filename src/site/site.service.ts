@@ -55,8 +55,8 @@ export class SiteService {
   async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<any> {
     const sql = `
       SELECT ST_DISTANCE(site.geom, ST_MakePoint(${lon}, ${lat})) as id
-      FROM site where site.id = ${siteId};
-      LIMIT 1
+      FROM site where site.id = ${siteId}
+      LIMIT 1;
     `
     const res = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
     // tslint:disable-line

@@ -50,7 +50,7 @@ export default {
     isWorker: true,
     isSupervisor: false,
     isAdministrator: false,
-    deviceId: null,
+    deviceId: '32q453453145345',
     base64Image: null,
     isSuperAdministrator: false,
   },
