@@ -11,6 +11,7 @@ import { Op, Model } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { isNil } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
+import { Site } from '../site/site.entity';
 
 @Injectable()
 export class TimesheetService {
