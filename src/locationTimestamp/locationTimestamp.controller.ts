@@ -34,18 +34,13 @@ export class LocationTimestampController {
     const worker = await this.workerService.findOneWhere({ where: { deviceId: loc.deviceId }});
     const blockedIds = await this.siteAssignmentService.getBlockedSiteIdsByWorkerId(
       req.dbUser.id);
-    console.log(blockedIds[0])
     const closestSiteId = await this.siteService.getClosestAssignedSiteId(
-      loc.latitude, loc.longitude, blockedIds[0], req.dbUser.companyId);
+      loc.latitude, loc.longitude, blockedIds, req.dbUser.companyId);
     const closestSiteDistance = await this.siteService.getDistanceToSite(
       closestSiteId, loc.latitude, loc.longitude);
-
     const device = await this.deviceService.findOneWhere({ where: { deviceId: loc.deviceId } });
-    console.log({ ...loc, closestSiteId, closestSiteDistance, workerId: worker.id, deviceId: device.id });
     const fullLoc = { ...loc, closestSiteId, closestSiteDistance, workerId: worker.id, deviceId: device.id };
     return await this.locationTimestampService.create(fullLoc);
-    return "Sdfsdfsdf"
-
   }
 
 }
