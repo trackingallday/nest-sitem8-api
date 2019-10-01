@@ -40,7 +40,6 @@ export class SiteService {
   }
 
   async getClosestAssignedSiteId(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<any> {
-
     const sql = `
       SELECT id from site
       WHERE id NOT IN (${excludedIds.length ? excludedIds.join(",") : 0})
@@ -48,18 +47,20 @@ export class SiteService {
       ORDER BY ST_DISTANCE(site.geom, ST_MakePoint(${lon}, ${lat})) ASC
       LIMIT 1;
     `;
-
-    return await this.SITE_REPOSITORY.sequelize.query(sql, { raw: false });
+    const res = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    // tslint:disable-line
+    return res[0].length ? res[0][0]['id'] : null;
   }
 
   async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<any> {
-    console.log(JSON.stringify(siteId), '*************************************************');
     const sql = `
-      SELECT ST_DISTANCE(site.geom, ST_MakePoint(${lon}, ${lat}))
-      FROM site where site.id = ${siteId};
+      SELECT ST_DISTANCE(site.geom, ST_MakePoint(${lon}, ${lat})) as id
+      FROM site where site.id = ${siteId}
+      LIMIT 1;
     `
-    console.log(sql);
-    return await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    const res = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    // tslint:disable-line
+    return res[0].length ? res[0][0]['id'] : null;
   }
 
 }

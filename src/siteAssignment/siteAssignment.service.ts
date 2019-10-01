@@ -51,7 +51,8 @@ export class SiteAssignmentService {
     WHERE wa.worker_id = ${workerId} and sa.archived = false
       and not wa.assigned_status = 0;
     `;
-    return await this.SITEASSIGNMENT_REPOSITORY.sequelize.query(sql, { raw: true });
+    const res = await this.SITEASSIGNMENT_REPOSITORY.sequelize.query(sql, { raw: true });
+    return res[0];
   }
 
 }

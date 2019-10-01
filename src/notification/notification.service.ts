@@ -6,7 +6,7 @@ import { NotificationConstants, NotificationStatus } from './constants';
 import { LocationTimestamp } from '../locationTimestamp/locationTimestamp.entity';
 import { Worker } from '../worker/worker.entity';
 import { isEmpty, isNil } from 'lodash';
-import moment from '../../node_modules/moment/src/moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class NotificationService {

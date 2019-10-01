@@ -8,7 +8,7 @@ import { genLocationTimestamp } from './dataGenerators';
 
 
 
-describe('tests the worker controller', () => {
+describe('tests the LocationTimestampController', () => {
 
   let locController: LocationTimestampController;
 
@@ -19,7 +19,7 @@ describe('tests the worker controller', () => {
     locController = app.get<LocationTimestampController>(LocationTimestampController);
   });
 
-  describe('CRUD for worker - make sure auth0 gets called', () => {
+  describe('CRUD for locs', () => {
 
     it('creates some locations', async () => {
       const locs = testconstants.nearOrbicaPoints.map(c => {

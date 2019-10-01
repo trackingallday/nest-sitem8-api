@@ -1,4 +1,9 @@
-import * as csv from 'csvtojson';
+export default function importLocations(filename) {
+  console.log('pop')
+}
+
+
+/*import * as csv from 'csvtojson';
 import { bootstrap } from '../main';
 import * as fs from 'fs';
 import * as parse from 'wellknown';
@@ -68,4 +73,4 @@ async function doImport(filename) {
 
 export default function importLocations(filename) {
   doImport(filename);
-}
+}*/

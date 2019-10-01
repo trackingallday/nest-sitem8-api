@@ -7,5 +7,10 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "globalSetup": "<rootDir>/setup.ts",
-  "globalTeardown": "<rootDir>/teardown.ts"
+  "globalTeardown": "<rootDir>/teardown.ts",
+  "globals": {
+    "ts-jest": {
+      "diagnostics": false
+    }
+  }
 }
