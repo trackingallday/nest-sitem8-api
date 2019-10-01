@@ -2,6 +2,7 @@
 import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Notification } from '../notification/notification.entity';
 import { Company } from '../company/company.entity';
+import { Timesheet } from '../timesheet/timesheet.entity';
 
 @Table({ tableName: 'worker', modelName: 'worker', underscored: true })
 export class Worker extends Model<Worker> {
@@ -63,4 +64,7 @@ export class Worker extends Model<Worker> {
 
   @BelongsTo(() => Company)
   company: Company;
+
+  @HasMany(() => Timesheet)
+  timesheets: Timesheet[];
 }

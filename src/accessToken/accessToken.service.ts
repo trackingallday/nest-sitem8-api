@@ -3,7 +3,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { AccessToken } from './accessToken.entity';
 import { AccessTokenInterface } from './accessToken.interface';
 import { createPassword } from '../common/global';
-import { Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 import moment from '../../node_modules/moment/src/moment';
 import { WorkerService } from '../worker/worker.service';
 import { ACCESSTOKENCONSTANTS } from './constants';

@@ -1,6 +1,7 @@
 
 import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
 import { Worker } from '../worker/worker.entity';
+import { Timesheet } from '../timesheet/timesheet.entity';
 
 @Table({ tableName: 'company', modelName: 'company', underscored: true })
 export class Company extends Model<Company> {
@@ -74,4 +75,6 @@ export class Company extends Model<Company> {
   @HasMany(() => Worker)
   workers: Worker[];
 
+  @HasMany(() => Timesheet)
+  timesheets: Timesheet[];
 }

@@ -1,14 +1,12 @@
 
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Timesheet } from '../timesheet/timesheet.entity';
 
 @Table({ tableName: 'timesheetentry', modelName: 'timesheetentry', underscored: true })
 export class TimesheetEntry extends Model<TimesheetEntry> {
 
   @Column(DataType.INTEGER)
   timesheetEntryId: number;
-
-  @Column(DataType.INTEGER)
-  timesheetId: number;
 
   @Column(DataType.DATE)
   startDateTime: Date;
@@ -34,5 +32,12 @@ export class TimesheetEntry extends Model<TimesheetEntry> {
   @Column(DataType.INTEGER)
   workerAssignmentStatus: number;
 
-}
+  @ForeignKey(() => Timesheet)
+  @Column(DataType.INTEGER)
+  @Column(DataType.INTEGER)
+  timesheetId: number;
 
+  @BelongsTo(() => Timesheet)
+  timesheet: Timesheet;
+
+}

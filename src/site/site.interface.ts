@@ -7,4 +7,3 @@ export class SiteInterface {
   readonly companyId: number;
   readonly sitePayrollId: string;
 }
-  
