@@ -44,4 +44,19 @@ export class TimesheetEntryService {
     });
   }
 
+  // delete timesheet entries by ids in imput array
+  async deleteByTimesheetId(timesheetId: number): Promise<void> {
+    await this.TIMESHEETENTRY_REPOSITORY.destroy({ where: { timesheetId } });
+  }
+
+  // bulk add timesheet entries
+  async addByTimesheetId(itemsToAdd: TimesheetEntry[]): Promise<void> {
+    await this.TIMESHEETENTRY_REPOSITORY.bulkCreate(itemsToAdd);
+  }
+
+  // bulk update timesheet entries
+  async updateByTimesheetId(timesheetId: number, description: string, modifiedWorkerId: number,
+                            updateProps: any = { description, modifiedWorkerId}): Promise<void> {
+    await this.TIMESHEETENTRY_REPOSITORY.update(updateProps, { where: { timesheetId } });
+  }
 }

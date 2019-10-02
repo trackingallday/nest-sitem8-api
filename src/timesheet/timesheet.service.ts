@@ -6,8 +6,8 @@ import { Company } from '../company/company.entity';
 import { DayOfWeek, TimesheetStatus } from './constants';
 import { Worker } from '../worker/worker.entity';
 import { Site } from '../site/site.entity';
+import * as moment from 'moment';
 import * as momenttz from 'moment-timezone';
-import { Op, Model } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { isNil } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
@@ -265,6 +265,25 @@ export class TimesheetService {
       order: [ 'startDateTime' ],
       },
     );
+  }
+
+ // AddDeleteUpdateTimesheetEntries: moved to timesheetentry.service.ts
+
+ // Returns list of timesheetId that are locked for which timesheetnote can be created by calling createTimesheetnoteForLockedTimesheets()
+ // createTimesheetnoteForLockedTimesheets : function in timesheetnotes
+  async LockTimesheets(timesheetIds: number[], companyId: number): Promise<number[]> {
+    const timesheetsUpdated = await this.TIMESHEET_REPOSITORY.update(
+      { status: TimesheetStatus.Locked },
+      {
+        where: {
+          timesheetId: timesheetIds,
+          status: TimesheetStatus.Approved,
+          companyId,
+          finishDateTime: { $lte: moment().utc() },
+        },
+      });
+    // Returns timesheet id's of updated rows
+    return timesheetsUpdated[1].map((m) => m.timesheetId);
   }
 
 }

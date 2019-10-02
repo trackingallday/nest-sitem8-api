@@ -51,4 +51,19 @@ export class TimesheetNoteService {
     return await this.addTimesheetNote(timesheetNote, companyId);
   }
 
+  async createTimesheetnoteForLockedTimesheets(timesheetIds: number[], loggedInWorkerId: number): Promise<void> {
+    const timesheetNotes: TimesheetNote[] = [];
+    timesheetIds.forEach(id => {
+      const timesheetNote: TimesheetNote = new TimesheetNote();
+      timesheetNote.timesheetId = id;
+      timesheetNote.workerId = loggedInWorkerId;
+      timesheetNote.priority = 0;
+      timesheetNote.creationDateTime = moment().utc().toDate();
+      timesheetNote.details = 'Timesheet locked.';
+
+      timesheetNotes.push(timesheetNote);
+    });
+    this.TIMESHEETNOTE_REPOSITORY.bulkCreate(timesheetNotes);
+  }
+
 }
