@@ -1,5 +1,6 @@
 
-import { Table, Column, Model, DataType, TableOptions } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
 
 @Table({ tableName: 'site', modelName: 'site', underscored: true })
 export class Site extends Model<Site> {
@@ -19,5 +20,10 @@ export class Site extends Model<Site> {
   @Column(DataType.STRING)
   sitePayrollId: string;
 
-}
+  @Column(DataType.INTEGER)
+  siteId: number;
 
+  @HasMany(() => TimesheetEntry)
+  timesheetEntry: TimesheetEntry[];
+
+}
