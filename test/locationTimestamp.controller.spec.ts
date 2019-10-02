@@ -6,7 +6,10 @@ import { mockPost, mockGet } from './httpUtils';
 import testconstants from './test-constants';
 import { genLocationTimestamp } from './dataGenerators';
 
-
+const expectedDistance0 = 0;
+const expectedDistance1 = 34.63897074;
+const expectedDistance2 = 32.34881906;
+const expectedDistance3 = 17.6417664;
 
 describe('tests the LocationTimestampController', () => {
 
@@ -21,14 +24,21 @@ describe('tests the LocationTimestampController', () => {
 
   describe('CRUD for locs', () => {
 
-    it('creates some locations', async () => {
+    it('creates some locations testing (also tests site service -> getClosestSite and getDistanceToSite)', async () => {
       const locs = testconstants.nearOrbicaPoints.map(c => {
         return genLocationTimestamp(testconstants.device.deviceId, c[1], c[0]);
       });
-
       const data = await Promise.all(locs.map(
         async l => await locController.create(mockPost('/locationtimestamp', l, { companyId: 1, id: 1 }), l)
       ));
+      expect(data.map(d => d.closestSiteId).every(i => i === 1)).toBeTruthy();
+      expect(data[0].closestSiteDistance).toBe(expectedDistance0);
+      expect(data[1].closestSiteDistance).toBe(expectedDistance1);
+      expect(data[2].closestSiteDistance).toBe(expectedDistance2);
+      expect(data[3].closestSiteDistance).toBe(expectedDistance3);
+    });
+
+    it('', async () => {
 
     });
 
