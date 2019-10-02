@@ -153,10 +153,10 @@ export class TimesheetService {
         ],
       },
     );
-    //tslint:disable
+    /* tslint:disable */
     return ts.timesheetEntry.map((tse, i) => {
       const timesheetView: TimesheetViewInterface = new TimesheetViewInterface();
-      timesheetView.siteId = tse.siteId; // todo: recheck this
+      timesheetView.siteId = tse.siteId;
       timesheetView.payrollId = ts.worker.payrollId;
       timesheetView.name = ts.worker.name;
       timesheetView.timesheetId = tse.timesheetId;
@@ -165,9 +165,10 @@ export class TimesheetService {
       timesheetView.startDateTime = tse.startDateTime;
       timesheetView.finishDateTime = tse.finishDateTime;
       timesheetView.rowNumber = i;
-
+      timesheetView.siteName = tse.site.name;
       return timesheetView;
     });
+    /* tslint:enable */
   }
 
 }
