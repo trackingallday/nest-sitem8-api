@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize-typescript';
+import { Sequelize, DataType } from 'sequelize-typescript';
 import  { Item } from '../items/items.entity';
 import  { AccessToken } from '../accessToken/accessToken.entity';
 import  { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
@@ -24,7 +24,9 @@ export const databaseProviders = [
       const sequelize = new Sequelize(DBDATABASE, DBPOSTGRESUSERNAME, DBPASSWORD, {
         dialect: 'postgres',
         logging: false,
+        dialectOptions: { decimalNumbers: true },
       });
+
       sequelize.addModels([
         Company,
         Item,
@@ -40,6 +42,12 @@ export const databaseProviders = [
         Worker,
         WorkerAssignment,
       ]);
+
+      sequelize.addHook('afterConnect', function setParsers() {
+        this.connectionManager.refreshTypeParser({
+          DECIMAL: { ...DataType.DECIMAL, parse: v => (v === null) ? v : parseFloat(v) },
+        });
+      });
       await sequelize.sync();
       return sequelize;
     },
