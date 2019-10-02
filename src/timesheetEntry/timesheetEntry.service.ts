@@ -2,7 +2,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { TimesheetEntry } from './timesheetEntry.entity';
 import { TimesheetEntryInterface } from './timesheetEntry.interface';
-import constants from '../constants'
+import constants from '../constants';
 
 @Injectable()
 export class TimesheetEntryService {
@@ -29,5 +29,19 @@ export class TimesheetEntryService {
     return await this.TIMESHEETENTRY_REPOSITORY.findByPk<TimesheetEntry>(id);
   }
 
-}
+  async deleteTimesheetEntries(startInclusive: Date, finishExclusive: Date, timesheetId: number[]): Promise<void> {
+   await this.TIMESHEETENTRY_REPOSITORY.destroy({
+     where:
+     {
+       id: timesheetId,
+       startDateTime: {
+        $lte: startInclusive.getDate(),
+      },
+      finishDateTime: {
+        $gt: finishExclusive.getDate(),
+      },
+     },
+    });
+  }
 
+}

@@ -3,7 +3,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Timesheet } from './timesheet.entity';
 import { TimesheetInterface, TimesheetViewInterface } from './timesheet.interface';
 import { Company } from '../company/company.entity';
-import { DayOfWeek } from './constants';
+import { DayOfWeek, TimesheetStatus } from './constants';
 import { Worker } from '../worker/worker.entity';
 import { Site } from '../site/site.entity';
 import * as momenttz from 'moment-timezone';
@@ -11,7 +11,6 @@ import { Op, Model } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { isNil } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
-import { Site } from '../site/site.entity';
 
 @Injectable()
 export class TimesheetService {
@@ -38,7 +37,7 @@ export class TimesheetService {
     return await this.TIMESHEET_REPOSITORY.findByPk<Timesheet>(id);
   }
 
-  async createTimesheetsIfMissing(utcNow: Date, company: Company) {
+  async createTimesheetsIfMissing(utcNow: Date, company: Company): Promise<void> {
     let count: number = 0;
     let errorCount: number = 0;
     if (company.startDayOfWeek < DayOfWeek.Sunday || company.startDayOfWeek > DayOfWeek.Saturday) {
@@ -70,10 +69,10 @@ export class TimesheetService {
       }],
       where: {
         startDateTime: {
-          [Op.lte]: now,
+          $lte: now,
         },
         finishDateTime: {
-          [Op.gt]: now,
+          $gt: now,
         },
       },
     });
@@ -121,12 +120,10 @@ export class TimesheetService {
     }
   }
 
-  // WIP : GetTimesheetViews
   async getTimesheetViews(timesheetId: number, timesheetStatus: number, companyId: number): Promise<TimesheetViewInterface[]> {
     const referenceTimesheet: Timesheet = await  this.findOneWhere({ timesheetId });
     const ts = await this.TIMESHEET_REPOSITORY.findOne<Timesheet>(
       {
-        subQuery: false,
         where: {
           companyId,
           startDateTime: referenceTimesheet.startDateTime.getDate(),
@@ -135,11 +132,13 @@ export class TimesheetService {
         },
         include: [
           {
+            attributes: [ 'payrollId', 'name'],
             model: Worker,
             required: true,
             as: 'worker',
           },
           {
+            attributes: ['siteId', 'startDateTime', 'finishDateTime', 'site' ],
             model: TimesheetEntry,
             required : true,
             as: 'timesheetEntry',
@@ -148,13 +147,14 @@ export class TimesheetService {
                 model: Site,
                 required: false,
                 as: 'site',
+                attributes: ['name', 'siteId'],
               },
             ],
           },
         ],
       },
     );
-    //tslint:disable
+
     return ts.timesheetEntry.map((tse, i) => {
       const timesheetView: TimesheetViewInterface = new TimesheetViewInterface();
       timesheetView.siteId = tse.siteId; // todo: recheck this
@@ -166,9 +166,105 @@ export class TimesheetService {
       timesheetView.startDateTime = tse.startDateTime;
       timesheetView.finishDateTime = tse.finishDateTime;
       timesheetView.rowNumber = i;
+      timesheetView.siteName = tse.site.name;
 
       return timesheetView;
     });
+  }
+
+  async getTimesheet(when: Date, workerId: number, companyId: number): Promise<Timesheet> {
+    return await this.findOneWhere({
+      where: { workerId, companyId, startDateTime: { $lte: when }, finishDateTime: { $gt: when} },
+    });
+  }
+
+  async getTimesheetsAndTimesheetEntries(when: any, companyId: number): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          companyId,
+          startDateTime: { $lte: when },
+          finishDateTime: { $gt: when},
+        },
+        include: [{
+          model: TimesheetEntry,
+          required : true,
+          as: 'timesheetEntry',
+      }],
+      },
+    );
+  }
+
+  // DeleteTimesheetEntries: moved to timesheetEntry.service.ts file
+
+  async getDistinctTimesheets(workerId: number, companyId: number): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          workerId,
+          companyId,
+        },
+        include: [{
+          model: TimesheetEntry,
+          required : true,
+          as: 'timesheetEntry',
+      }],
+      limit: 100,
+      order: [ 'startDateTime' ],
+      },
+    );
+  }
+
+  async setTimesheetStatus(timesheetId: number, timesheetStatus: number, companyId: number): Promise<void> {
+    const timesheet: Timesheet = await this.findOneWhere(timesheetId);
+    if (isNil(timesheet)) {
+      // todo:
+      // throw new SiteM8Exception($"Timesheet with ID of {timesheetId} could not be found.");
+    }
+    if (timesheet.companyId !== companyId) {
+      // todo:
+      // throw new SiteM8Exception("Timesheet not modified because it of different company Id");
+    }
+
+    if (timesheet.status === timesheetStatus) {
+      return;
+    } else if (timesheet.status === TimesheetStatus.Locked) {
+      // todo:
+      // throw new SiteM8Exception($"Timesheet with ID of {timesheetId} could not have status modified because it is locked.");
+    } else {
+      timesheet.status = timesheetStatus;
+      await timesheet.save();
+    }
+  }
+
+  async getUnlockedTimesheetsBySupervisorWorkerId(supervisorWorkerId: number, companyId: number): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          companyId,
+          status: { $ne: TimesheetStatus.Locked},
+        },
+        include: [{
+          model: Worker,
+          required : true,
+          as: 'worker',
+          where: { supervisor: supervisorWorkerId },
+      }],
+      order: [ 'startDateTime' ],
+      },
+    );
+  }
+
+  async getUnlockedTimesheets(companyId: number): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          companyId,
+          status: { $ne: TimesheetStatus.Locked},
+        },
+      order: [ 'startDateTime' ],
+      },
+    );
   }
 
 }
