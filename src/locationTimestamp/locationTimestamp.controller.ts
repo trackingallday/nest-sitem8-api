@@ -32,15 +32,31 @@ export class LocationTimestampController {
   @UsePipes(new ValidationPipe())
   async create(@Req() req, @Body() loc: LocationTimestampDto) {
     const worker = await this.workerService.findOneWhere({ where: { deviceId: loc.deviceId }});
+
     const blockedIds = await this.siteAssignmentService.getBlockedSiteIdsByWorkerId(
       req.dbUser.id);
+
     const closestSiteId = await this.siteService.getClosestAssignedSiteId(
       loc.latitude, loc.longitude, blockedIds, req.dbUser.companyId);
+
     const closestSiteDistance = await this.siteService.getDistanceToSite(
       closestSiteId, loc.latitude, loc.longitude);
+
     const device = await this.deviceService.findOneWhere({ where: { deviceId: loc.deviceId } });
+
     const fullLoc = { ...loc, closestSiteId, closestSiteDistance, workerId: worker.id, deviceId: device.id };
-    return await this.locationTimestampService.create(fullLoc);
+
+    const locEntity = await this.locationTimestampService.create(fullLoc);
+    return locEntity.toJSON();
   }
+
+  @Get('/latestlocationtimestamps')
+  async getLatestLocations(@Req() req) {
+    const workerIds = this.workerService.findAllWhere({ where: {
+      companyId: req.dbuser.companyId,
+      enabled: true,
+    }});
+  }
+
 
 }
