@@ -1,6 +1,7 @@
 
 import { Injectable, Inject } from '@nestjs/common';
-import { Op } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
+import * as convertKeys from 'convert-keys';
 import { LocationTimestamp } from './locationTimestamp.entity';
 import { LocationTimestampInterface } from './locationTimestamp.interface';
 import constants from '../constants'
@@ -37,29 +38,25 @@ export class LocationTimestampService {
       where: {
         deviceId,
         locationDateTime: {
-          $and: {
-            $lte: endDate,
-            $gte: startDate,
-          },
+          [Op.gte]: startDate,
+          [Op.lte]: endDate,
         },
       },
     };
     return await this.findAllWhere(props);
   }
 
-  async findByCompanyIdDateRange(startDate: Date, endDate: Date, companyId: string) {
+  async findByCompanyIdDateRange(startDate: Date, endDate: Date, companyId: number) {
     const props = {
       where: {
         companyId,
         locationDateTime: {
-          $and: {
-            $lte: endDate,
-            $gte: startDate,
-          },
+          [Op.gte]: startDate,
+          [Op.lte]: endDate,
         },
       },
       order: [
-        'locationDateTime', 'DESC',
+        ['location_date_time', 'DESC']
       ],
     };
     return await this.findAllWhere(props);
@@ -68,18 +65,12 @@ export class LocationTimestampService {
   async getLastOnSite(workerId: number, maxDistance: number): Promise<LocationTimestamp> {
     const props = {
       where: {
-        $and: {
-          workerId,
-          closestSiteId: {
-            $not: null,
-          },
-          closestSiteDistance: {
-            $lte: maxDistance,
-          },
-        },
+        workerId,
+        closestSiteId: { [Op.ne]: null },
+        closestSiteDistance: { [Op.lt]: maxDistance },
       },
       order: [
-        'locationDateTime', 'DESC',
+        ['location_date_time', 'DESC']
       ],
       limit: 1,
     };
@@ -102,9 +93,12 @@ export class LocationTimestampService {
 
     ON q1.creation_date_time = q2.max_time
     `;
-    const res = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, { raw: false });
-    const locs:LocationTimestamp[] = res[0];
-    return locs;
+    const res = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
+      raw: false,
+      type: QueryTypes.SELECT
+    });
+    const locs:LocationTimestamp[] = res;
+    return locs.map((l) => convertKeys.toCamel(l));
   }
 }
 

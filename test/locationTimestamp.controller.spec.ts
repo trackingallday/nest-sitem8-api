@@ -25,8 +25,8 @@ describe('tests the LocationTimestampController', () => {
   describe('CRUD for locs', () => {
 
     it('creates some locations testing (also tests site service -> getClosestSite and getDistanceToSite)', async () => {
-      const locs = testconstants.nearOrbicaPoints.map(c => {
-        return genLocationTimestamp(testconstants.device.deviceId, c[1], c[0]);
+      const locs = testconstants.nearOrbicaPoints.map((c, i) => {
+        return genLocationTimestamp(testconstants.device.deviceId, c[1], c[0], i);
       });
       const data = await Promise.all(locs.map(
         async l => await locController.create(
@@ -42,8 +42,9 @@ describe('tests the LocationTimestampController', () => {
     it('gets the latest timestamps for the workers', async () => {
       const locs = await locController.getLatestLocations(
         mockGet('/latestlocationtimestamps', { companyId: 1, id: 1 }));
+
       expect(locs.length).toBe(1);
-      expect(locs[0].id).toBe(4);
+      expect(locs[0].closestSiteDistance).toBe(0);
     });
 
   });
