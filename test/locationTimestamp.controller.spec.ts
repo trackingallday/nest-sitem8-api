@@ -5,6 +5,7 @@ import { DatabaseModule } from '../src/db/database.module';
 import { mockPost, mockGet } from './httpUtils';
 import testconstants from './test-constants';
 import { genLocationTimestamp } from './dataGenerators';
+import { LocationTimestamp } from 'src/locationTimestamp/locationTimestamp.entity';
 
 const expectedDistance0 = 0;
 const expectedDistance1 = 34.63897074;
@@ -28,7 +29,8 @@ describe('tests the LocationTimestampController', () => {
       const locs = testconstants.nearOrbicaPoints.map((c, i) => {
         return genLocationTimestamp(testconstants.device.deviceId, c[1], c[0], i);
       });
-      const data = await Promise.all(locs.map(
+
+      const data:any[] = await Promise.all(locs.map(
         async l => await locController.create(
           mockPost('/locationtimestamp', l, { companyId: 1, id: 1 }), l)));
 
