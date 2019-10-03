@@ -39,7 +39,7 @@ export class SiteService {
     return item;
   }
 
-  async getClosestAssignedSiteId(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<any> {
+  async getClosestAssignedSiteId(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<number> {
     const sql = `
       SELECT id from site
       WHERE id NOT IN (${excludedIds.length ? excludedIds.join(",") : 0})
@@ -52,12 +52,15 @@ export class SiteService {
         ASC
       LIMIT 1;
     `;
-    const res = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    // tslint:disable-line
-    return res[0].length ? parseInt(res[0][0]['id']) : null;
+    const res: any[] = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    if(!res[0].length) {
+      return null;
+    }
+    const answer: any = res[0][0];
+    return parseInt(answer['id']);
   }
 
-  async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<any> {
+  async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<number> {
     const sql = `
       SELECT
         ST_Distance_Sphere(
@@ -67,9 +70,12 @@ export class SiteService {
       FROM site where site.id = ${siteId}
       LIMIT 1;
     `
-    const res = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    // tslint:disable-line
-    return res[0].length ? parseFloat(res[0][0]['distance_meters']) : null;
+    const res: any[] = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    if(!res[0].length) {
+      return null;
+    }
+    const answer: Object = res[0][0];
+    return parseFloat(answer['distance_meters']);
   }
 
 }

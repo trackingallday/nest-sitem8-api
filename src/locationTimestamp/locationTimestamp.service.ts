@@ -77,7 +77,8 @@ export class LocationTimestampService {
     return await this.findOneWhere(props);
   }
 
-  async getLatestByWorkerIds(workerIds: number[]): Promise<LocationTimestamp[]> {
+  // Typescript doesnt know that the toCamel will make them 
+  async getLatestByWorkerIds(workerIds: number[]): Promise<any[]> {
     if(!workerIds.length) {
       return [];
     }
@@ -93,12 +94,11 @@ export class LocationTimestampService {
 
     ON q1.creation_date_time = q2.max_time
     `;
-    const res = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
+    const res:any[] = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
       raw: false,
       type: QueryTypes.SELECT
     });
-    const locs:LocationTimestamp[] = res;
-    return locs.map((l) => convertKeys.toCamel(l));
+    return res.map((l) => convertKeys.toCamel(l));
   }
 }
 

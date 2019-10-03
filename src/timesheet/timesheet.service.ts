@@ -5,7 +5,6 @@ import { TimesheetInterface, TimesheetViewInterface } from './timesheet.interfac
 import { Company } from '../company/company.entity';
 import { DayOfWeek } from './constants';
 import { Worker } from '../worker/worker.entity';
-import { Site } from '../site/site.entity';
 import * as momenttz from 'moment-timezone';
 import { Op, Model } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
