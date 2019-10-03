@@ -18,7 +18,6 @@ if there is any match it errors out
 shouldn't ever happen - but want to keep it as a security layer just in case - is fast so meh
 */
 
-@Injectable()
 export class CompanyGuardInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
     //get the original request with the dbUser attached
