@@ -29,8 +29,9 @@ describe('tests the LocationTimestampController', () => {
         return genLocationTimestamp(testconstants.device.deviceId, c[1], c[0]);
       });
       const data = await Promise.all(locs.map(
-        async l => await locController.create(mockPost('/locationtimestamp', l, { companyId: 1, id: 1 }), l)
-      ));
+        async l => await locController.create(
+          mockPost('/locationtimestamp', l, { companyId: 1, id: 1 }), l)));
+
       expect(data.map(d => d.closestSiteId).every(i => i === 1)).toBeTruthy();
       expect(data[0].closestSiteDistance).toBe(expectedDistance0);
       expect(data[1].closestSiteDistance).toBe(expectedDistance1);
@@ -38,8 +39,11 @@ describe('tests the LocationTimestampController', () => {
       expect(data[3].closestSiteDistance).toBe(expectedDistance3);
     });
 
-    it('', async () => {
-
+    it('gets the latest timestamps for the workers', async () => {
+      const locs = await locController.getLatestLocations(
+        mockGet('/latestlocationtimestamps', { companyId: 1, id: 1 }));
+      expect(locs.length).toBe(1);
+      expect(locs[0].id).toBe(4);
     });
 
   });

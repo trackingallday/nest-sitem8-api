@@ -27,13 +27,7 @@ export class AccessTokenController {
     this.accessTokenService.create(accessToken);
   }
 
-  @Post('/:id')
-  @UsePipes(new ValidationPipe())
-  async update(@Param() id: number, @Body() accessToken: AccessTokenDto) {
-    const thisAccessToken = await this.accessTokenService.findById(id);
-    thisAccessToken.set(accessToken);
-    await thisAccessToken.save();
-    return thisAccessToken;
-  }
+
+
 }
 
