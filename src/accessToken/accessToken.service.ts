@@ -2,6 +2,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { AccessToken } from './accessToken.entity';
 import { Worker } from '../worker/worker.entity';
+import { WorkerService } from '../worker/worker.service';
 import { AccessTokenInterface } from './accessToken.interface';
 import { createPassword } from '../common/global';
 import { Sequelize } from 'sequelize-typescript';
@@ -20,8 +21,9 @@ const {
 @Injectable()
 export class AccessTokenService {
 
+  constructor(private readonly workerService: WorkerService) {}
+
   @Inject('ACCESSTOKEN_REPOSITORY') private readonly ACCESSTOKEN_REPOSITORY: typeof AccessToken;
-  @Inject('WORKER_REPOSITORY') private readonly WORKER_REPOSITORY: typeof Worker;
 
   async findAll(): Promise<AccessToken[]> {
     return await this.ACCESSTOKEN_REPOSITORY.findAll<AccessToken>();

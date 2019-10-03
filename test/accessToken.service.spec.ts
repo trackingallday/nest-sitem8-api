@@ -17,12 +17,10 @@ describe('tests the Access Token', () => {
   let accService: AccessTokenService;
 
   beforeEach(async () => {
-    console.log(accService, '#$%#^#$%&#$&#$%&#$%&#$%^&@$%^@$%^@^$')
     const app: TestingModule = await Test.createTestingModule({
-      imports: [DatabaseModule, AccessTokenModule, WorkerModule],
+      imports: [DatabaseModule, WorkerModule, AccessTokenModule],
     }).compile();
     accService = app.get<AccessTokenService>(AccessTokenService);
-    console.log(accService, '#$%#^#$%&#$&#$%&#$%&#$%^&@$%^@$%^@^$')
   });
 
   describe('test up the accessToken service', () => {
