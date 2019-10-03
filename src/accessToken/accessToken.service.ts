@@ -47,20 +47,19 @@ export class AccessTokenService {
 
   async getAccessToken(accessTokenId: string): Promise<AccessToken> {
     return await this.ACCESSTOKEN_REPOSITORY.findOne<AccessToken>({
-      where: Sequelize.where(
-        Sequelize.fn('lower', Sequelize.col('accessTokenId')),
-        Sequelize.fn('lower', accessTokenId),
-    ) });
+      where: { accessTokenId },
+    });
   }
 
   async createAccessToken(workerId: number): Promise<string> {
-    const accessToken: AccessToken = new AccessToken();
-    accessToken.creationDateTime = moment().utc().toDate();
-    accessToken.workerId = workerId;
-    accessToken.accessTokenId = await createPassword(10);
+    const props = { 
+      creationDateTime: moment().utc().toDate(),
+      workerId,
+      accessTokenId: await createPassword(10),
+    };
     // Add to database.
-    await this.create(accessToken);
-    return accessToken.accessTokenId;
+    const token = await this.create(props);
+    return token.accessTokenId;
   }
 
   // accesstokenmanager - GetAccessToken
@@ -72,7 +71,7 @@ export class AccessTokenService {
   async getWorkerFromAccessToken(accessTokenId: string): Promise<any> {
     const at: AccessToken = await this.getAccessToken(accessTokenId);
     if(this.checkAccessToken(at)) {
-      return null;//await Worker.findOne({ where: { id: at.workerId }});
+      return await Worker.findOne({ where: { id: at.workerId }});
     }
     return null;
   }
