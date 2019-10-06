@@ -46,7 +46,7 @@ export class TimesheetController {
   @Get('mytimesheet/data/:company/:token')
   async myTimesheet(@Param() params): Promise<any> {
     const worker: Worker = await this.accesstokenService.getWorkerFromAccessToken(params.token);
-    const companyId: number = params.companyId;
+    const companyId: number = worker.companyId;
     const retvals = {
       worker: await this.workerService.getWorkersByCompany(companyId, false),
       sites: await this.siteService.findAllWhere({ companyId }),
