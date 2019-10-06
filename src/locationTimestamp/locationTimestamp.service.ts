@@ -33,7 +33,7 @@ export class LocationTimestampService {
   }
 
   // GetLocationTimestamps(DateTime startInclusive, DateTime finishExclusive, string DeviceId, bool includeNullLocations)
-  async findByDeviceIdDateRange(startDate: Date, endDate: Date, deviceId: string) {
+  async findByDeviceIdDateRange(startDate: Date, endDate: Date, deviceId: string): Promise<LocationTimestamp[]> {
     const props = {
       where: {
         deviceId,
@@ -42,11 +42,14 @@ export class LocationTimestampService {
           [Op.lte]: endDate,
         },
       },
+      order:  [
+        ['location_date_time', 'DESC']
+      ],
     };
     return await this.findAllWhere(props);
   }
 
-  async findByCompanyIdDateRange(startDate: Date, endDate: Date, companyId: number) {
+  async findByCompanyIdDateRange(startDate: Date, endDate: Date, companyId: number): Promise<LocationTimestamp[]> {
     const props = {
       where: {
         companyId,
