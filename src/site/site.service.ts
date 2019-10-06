@@ -52,8 +52,8 @@ export class SiteService {
         ASC
       LIMIT 1;
     `;
-    const res = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    // tslint:disable-line
+    const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+
     return res[0].length ? parseInt(res[0][0]['id']) : null;
   }
 
@@ -67,8 +67,7 @@ export class SiteService {
       FROM site where site.id = ${siteId}
       LIMIT 1;
     `
-    const res = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    // tslint:disable-line
+    const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
     return res[0].length ? parseFloat(res[0][0]['distance_meters']) : null;
   }
 

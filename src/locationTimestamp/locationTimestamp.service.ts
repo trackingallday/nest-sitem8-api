@@ -93,12 +93,11 @@ export class LocationTimestampService {
 
     ON q1.creation_date_time = q2.max_time
     `;
-    const res = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
+    const res:LocationTimestamp[] = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
       raw: false,
       type: QueryTypes.SELECT
     });
-    const locs:LocationTimestamp[] = res;
-    return locs.map((l) => convertKeys.toCamel(l));
+    return res.map((l) => convertKeys.toCamel(l));
   }
 }
 
