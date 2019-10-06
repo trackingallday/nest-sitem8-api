@@ -59,6 +59,10 @@ export class TimesheetEntryService {
     await this.TIMESHEETENTRY_REPOSITORY.update(updateProps, { where: { timesheetId } });
   }
 
+  async getTimesheetEntriesByTimesheetIdForCompany(timesheetId: number, companyId: number): Promise<TimesheetEntry[]> {
+    return await this.TIMESHEETENTRY_REPOSITORY.findAll<TimesheetEntry>({ where: { timesheetId, companyId } });
+  }
+
   async getTimesheetEntriesByTimesheetId(timesheetId: number): Promise<TimesheetEntry[]> {
     return await this.TIMESHEETENTRY_REPOSITORY.findAll<TimesheetEntry>({ where: { timesheetId } });
   }

@@ -5,7 +5,6 @@ import { TimesheetNote } from './timesheetNote.entity';
 import TimesheetNoteDto from './timesheetNote.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
-
 @Controller('timesheetNote')
 export class TimesheetNoteController {
 
@@ -16,9 +15,10 @@ export class TimesheetNoteController {
     return this.timesheetNoteService.findAll();
   }
 
-  @Get('/:id')
+  // GetTimesheetNotes
+  @Get('/:timesheetNoteId')
   async findById(@Param() params): Promise<TimesheetNote> {
-    return this.timesheetNoteService.findById(parseInt(params.id));
+    return this.timesheetNoteService.findById(params.timesheetNoteId);
   }
 
   @Post()
@@ -35,5 +35,16 @@ export class TimesheetNoteController {
     await thisTimesheetNote.save();
     return thisTimesheetNote;
   }
-}
 
+  @Post('mytimesheet/addtimesheetnote/')
+  @UsePipes(new ValidationPipe())
+  async addTimesheetNote(@Body() timesheetNote: TimesheetNote = null, @Body() companyId: number) {
+    this.timesheetNoteService.addTimesheetNote(timesheetNote, companyId);
+  }
+
+  @Get('timesheetnotes/:id')
+  async GetTimesheetNotes(@Param() params): Promise<TimesheetNote> {
+    return await this.timesheetNoteService.getTimesheetNotes(params.timesheetId, params.companyId);
+  }
+
+}
