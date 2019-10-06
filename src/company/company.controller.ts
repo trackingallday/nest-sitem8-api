@@ -5,13 +5,12 @@ import { Company } from './company.entity';
 import CompanyDto from './company.dto';
 import { CreateCompanyParams } from './company.interface';
 import { ValidationPipe } from '../common/validation.pipe';
-import { WorkerService } from '../worker/worker.service';
+
 
 @Controller('company')
 export class CompanyController {
 
-  constructor(private readonly companyService: CompanyService,
-              private readonly workerService: WorkerService ) {}
+  constructor(private readonly companyService: CompanyService) {}
 
   @Get()
   async findAll(): Promise<Company[]> {
@@ -84,7 +83,7 @@ export class CompanyController {
     return await this.companyService.getCompanyByWorkerId(req.dbUser.companyId);
   }
 
-  @Get('getcogetallcompaniesmpany')
+  @Get('getallcompanies')
   async getAllCompanies(): Promise<Company[]> {
     return await this.companyService.findAll();
   }
