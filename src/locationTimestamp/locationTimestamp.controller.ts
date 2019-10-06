@@ -44,7 +44,8 @@ export class LocationTimestampController {
       closestSiteId, loc.latitude, loc.longitude);
     const device = await this.deviceService.findOneWhere({ where: { deviceId: loc.deviceId } });
     const fullLoc = { ...loc, closestSiteId, closestSiteDistance, workerId: worker.id, deviceId: device.id };
-    return await this.locationTimestampService.create(fullLoc);
+    const res = await this.locationTimestampService.create(fullLoc);
+    return res.toJSON();
   }
 
   @Get('/latestlocationtimestamps')
