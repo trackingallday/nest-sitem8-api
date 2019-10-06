@@ -63,8 +63,11 @@ export class WorkerService {
   }
 
   // GetAllUsers
-  async getWorkersByCompany(companyId: number): Promise<Worker[]> {
-    return await this.findAllWhere({ where: { companyId }});
+  async getWorkersByCompany(companyId: number, isAdmin: boolean): Promise<Worker[]> {
+    const workers = isAdmin ? await this.findAllWhere({ where: { companyId } }) :
+      await this.findAllWhere({ where: { companyId }, attributes: ['workerId', 'name'] });
+
+    return workers;
   }
 
   async switchCompany(workerId: number, companyId: number): Promise<Worker> {

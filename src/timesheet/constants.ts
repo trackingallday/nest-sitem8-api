@@ -13,3 +13,9 @@ export const TimesheetStatus = {
   Approved: 1,
   Locked: 2,
 };
+
+export const TimesheetFormat = {
+  GroupByWorkerDaySite : 0,
+  GroupByWorkerDay : 1,
+  GroupByTimesheetEntry : 2,
+};

@@ -53,22 +53,18 @@ export class SiteService {
       LIMIT 1;
     `;
     const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-
-    return res[0].length ? parseInt(res[0][0]['id']) : null;
+    return res[0].length ? res[0][0]['id'] : null;
   }
 
   async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<any> {
     const sql = `
-      SELECT
-        ST_Distance_Sphere(
-          ST_SetSRID(site.geom, 4326),
-          ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326)
-      ) AS distance_meters
+      SELECT ST_DISTANCE(site.geom, ST_MakePoint(${lon}, ${lat})) as id
       FROM site where site.id = ${siteId}
       LIMIT 1;
     `
     const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    return res[0].length ? parseFloat(res[0][0]['distance_meters']) : null;
+    // tslint:disable-line
+    return res[0].length ? res[0][0]['id'] : null;
   }
 
 }

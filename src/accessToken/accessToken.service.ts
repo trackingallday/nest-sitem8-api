@@ -14,9 +14,8 @@ const {
   FAILURECOUNTLIMIT,
   FAILUREDATETIME,
   FAILURESECONDSLIMIT,
-  accessTokenExpiryDays
+  accessTokenExpiryDays,
 } = ACCESSTOKENCONSTANTS;
-
 
 @Injectable()
 export class AccessTokenService {
@@ -52,7 +51,7 @@ export class AccessTokenService {
   }
 
   async createAccessToken(workerId: number): Promise<string> {
-    const props = { 
+    const props = {
       creationDateTime: moment().utc().toDate(),
       workerId,
       accessTokenId: await createPassword(10),
@@ -70,8 +69,8 @@ export class AccessTokenService {
 
   async getWorkerFromAccessToken(accessTokenId: string): Promise<any> {
     const at: AccessToken = await this.getAccessToken(accessTokenId);
-    if(this.checkAccessToken(at)) {
-      return await Worker.findOne({ where: { id: at.workerId }});
+    if (this.checkAccessToken(at)) {
+      return await this.workerService.findById(at.workerId);
     }
     return null;
   }

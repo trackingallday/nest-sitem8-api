@@ -3,6 +3,7 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany } from '
 import { Worker } from '../worker/worker.entity';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
 import { Company } from '../company/company.entity';
+import { TimesheetNote } from '../timesheetNote/timesheetNote.entity';
 
 @Table({ tableName: 'timesheet', modelName: 'timesheet', underscored: true })
 export class Timesheet extends Model<Timesheet> {
@@ -35,4 +36,7 @@ export class Timesheet extends Model<Timesheet> {
 
   @BelongsTo(() => Company)
   company: Company;
+
+  @HasMany(() => TimesheetNote)
+  timesheetNote: TimesheetNote[];
 }
