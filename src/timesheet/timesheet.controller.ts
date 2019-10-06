@@ -72,4 +72,41 @@ export class TimesheetController {
   async setTimesheetStatus(@Body() statusParams: any) {
     return await this.timesheetService.setTimesheetStatus(statusParams.id, statusParams.status, statusParams.companyId);
   }
+
+  // Reportcontroller
+  @Get('getapprovedtimesheetcount/')
+  async getApprovedTimesheetCount(@Body() params) {
+    return await this.timesheetService.countTimesheetsWithStatus(params.timesheetId, params.timesheetStatus, params.companyId);
+  }
+
+  @Get('distincttimesheets/')
+  async getDistinctTimesheets(@Body() params) {
+    return await this.timesheetService.getDistinctTimesheets(params.companyId, null);
+  }
+
+  @Get('mydistincttimesheets/:token/:companyId')
+  async getMyDistinctTimesheets(@Param() token: string, @Param() companyId: number) {
+    const worker: Worker = await this.accesstokenService.getWorkerFromAccessToken(token);
+    return await this.timesheetService.getDistinctTimesheets(companyId, worker.workerId);
+  }
+
+  @Get('timesheetexport/:id/:format')
+  async getTimesheetReport(@Param() id: number, @Param() TimesheetFormat: number) {
+   // todo
+  }
+
+  @Post('devicereport')
+  async getDeviceReport(@Body() reportParams: { reportDate: Date, workerId: number}) {
+   // todo
+  }
+
+  @Get('timesheetexport/:id/:format')
+  async exportTimesheet(@Param() id: number, @Param() TimesheetFormat: number) {
+   // todo
+  }
+
+  @Get('locktimesheets/:id')
+  async lockTimesheets(@Param() id: number, @Param() companyId: number) {
+    return await this.timesheetService.LockTimesheets([id], companyId);
+  }
 }
