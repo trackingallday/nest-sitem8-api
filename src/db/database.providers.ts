@@ -1,4 +1,5 @@
 import { Sequelize, DataType } from 'sequelize-typescript';
+import { Injectable, Inject } from '@nestjs/common';
 import  { Item } from '../items/items.entity';
 import  { AccessToken } from '../accessToken/accessToken.entity';
 import  { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
@@ -14,13 +15,13 @@ import { Worker } from '../worker/worker.entity';
 import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
 import { Company } from '../company/company.entity';
 
-
 const { DBDATABASE, DBPASSWORD, DBPROVIDE, DBPOSTGRESUSERNAME, DBDIALECT, DBHOST, DBPORT } = process.env;
 
 export const databaseProviders = [
   {
     provide: 'SEQUELIZE',//MUST BE A STRING AND NOT A VARIABLE OTHERWISE ERROR
     useFactory: async () => {
+
       const sequelize = new Sequelize(DBDATABASE, DBPOSTGRESUSERNAME, DBPASSWORD, {
         dialect: 'postgres',
         logging: false,
@@ -32,16 +33,16 @@ export const databaseProviders = [
         Company,
         Item,
         AccessToken,
+        SiteAssignment,
         DayOfWeekTimeSetting,
+        WorkerAssignment,
         Device,
         LocationTimestamp,
         Notification,
         Site,
-        SiteAssignment,
         Timesheet,
         TimesheetEntry,
         Worker,
-        WorkerAssignment,
       ]);
 
       sequelize.addHook('afterConnect', function setParsers() {
@@ -49,7 +50,7 @@ export const databaseProviders = [
           DECIMAL: { ...DataType.DECIMAL, parse: v => (v === null) ? v : parseFloat(v) },
         });
       });
-
+      
       await sequelize.sync();
       return sequelize;
     },

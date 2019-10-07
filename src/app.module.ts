@@ -19,14 +19,13 @@ import { NotificationModule } from './notification/notification.module';
 import { DatabaseModule } from './db/database.module';
 import { WorkerController } from './worker/worker.controller';
 import { ItemsController } from './items/items.controller';
-import { WorkerService } from './worker/worker.service';
 
 
 @Module({
   imports: [
     CompanyModule,
     ItemsModule,
-    SiteModule,
+    /*SiteModule,
     TimesheetEntryModule,
     WorkerModule,
     AccessTokenModule,
@@ -37,14 +36,14 @@ import { WorkerService } from './worker/worker.service';
     LocationTimestampModule,
     NotificationModule,
     TimesheetNoteModule,
-    DeviceModule,
+    DeviceModule,*/
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
 
-  public configure(consumer: MiddlewareConsumer) {
+ public configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthenticationMiddleware, DbUserMiddleware)
       .exclude({ path: '/', method: RequestMethod.ALL })
