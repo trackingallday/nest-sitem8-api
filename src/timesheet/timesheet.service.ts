@@ -3,14 +3,14 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Timesheet } from './timesheet.entity';
 import { TimesheetInterface, TimesheetViewInterface } from './timesheet.interface';
 import { Company } from '../company/company.entity';
-import { DayOfWeek } from './constants';
+import { DayOfWeek, TimesheetStatus } from './constants';
 import { Worker } from '../worker/worker.entity';
 import * as momenttz from 'moment-timezone';
 import { Op, Model } from 'sequelize';
+import * as moment from 'moment';
 import { Sequelize } from 'sequelize-typescript';
 import { isNil } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
-import { Site } from '../site/site.entity';
 
 @Injectable()
 export class TimesheetService {
@@ -33,11 +33,12 @@ export class TimesheetService {
     return await this.TIMESHEET_REPOSITORY.findOne<Timesheet>(props);
   }
 
-  async findById(id: number): Promise<Timesheet> {
-    return await this.TIMESHEET_REPOSITORY.findByPk<Timesheet>(id);
+  // GetTimesheet
+  async findById(timesheetId: number, companyId: number): Promise<Timesheet> {
+    return await this.TIMESHEET_REPOSITORY.findOne<Timesheet>({ where: { companyId, timesheetId } });
   }
 
-  async createTimesheetsIfMissing(utcNow: Date, company: Company) {
+  async createTimesheetsIfMissing(utcNow: Date, company: Company): Promise<void> {
     let count: number = 0;
     let errorCount: number = 0;
     if (company.startDayOfWeek < DayOfWeek.Sunday || company.startDayOfWeek > DayOfWeek.Saturday) {
@@ -69,10 +70,10 @@ export class TimesheetService {
       }],
       where: {
         startDateTime: {
-          [Op.lte]: now,
+          $lte: now,
         },
         finishDateTime: {
-          [Op.gt]: now,
+          $gt: now,
         },
       },
     });
@@ -86,12 +87,12 @@ export class TimesheetService {
         newtimesheet.workerId = element.workerId;
         newtimesheet.companyId = company.companyId;
 
-         // It is unexpected, but possible that the start day of the week has changed, which requires us to
-      // create a timesheet that is not 7 days long.
+        // It is unexpected, but possible that the start day of the week has changed, which requires us to
+        // create a timesheet that is not 7 days long.
 
         const lastTimesheetFinishDateTime = await this.TIMESHEET_REPOSITORY.findOne<Timesheet>({
-         attributes: [[Sequelize.fn('max', Sequelize.col('finishDateTime')), 'max']],
-         where: { workerId: element.workerId, finishDateTime : { $ne: null } },
+          attributes: [[Sequelize.fn('max', Sequelize.col('finishDateTime')), 'max']],
+          where: { workerId: element.workerId, finishDateTime: { $ne: null } },
         });
         if (!isNil(lastTimesheetFinishDateTime) && lastTimesheetFinishDateTime.finishDateTime > newtimesheet.startDateTime) {
           // Unit test has timesheets in year 2000, and we don't want these to be screwed up by future data.
@@ -120,12 +121,10 @@ export class TimesheetService {
     }
   }
 
-  // WIP : GetTimesheetViews
   async getTimesheetViews(timesheetId: number, timesheetStatus: number, companyId: number): Promise<TimesheetViewInterface[]> {
-    const referenceTimesheet: Timesheet = await  this.findOneWhere({ timesheetId });
+    const referenceTimesheet: Timesheet = await this.findOneWhere({ timesheetId });
     const ts = await this.TIMESHEET_REPOSITORY.findOne<Timesheet>(
       {
-        subQuery: false,
         where: {
           companyId,
           startDateTime: referenceTimesheet.startDateTime.getDate(),
@@ -134,29 +133,32 @@ export class TimesheetService {
         },
         include: [
           {
+            attributes: ['payrollId', 'name'],
             model: Worker,
             required: true,
             as: 'worker',
           },
           {
+            attributes: ['siteId', 'startDateTime', 'finishDateTime', 'site'],
             model: TimesheetEntry,
-            required : true,
+            required: true,
             as: 'timesheetEntry',
             include: [
               {
                 model: Site,
                 required: false,
                 as: 'site',
+                attributes: ['name', 'siteId'],
               },
             ],
           },
         ],
       },
     );
-    /* tslint:disable */
+
     return ts.timesheetEntry.map((tse, i) => {
       const timesheetView: TimesheetViewInterface = new TimesheetViewInterface();
-      timesheetView.siteId = tse.siteId;
+      timesheetView.siteId = tse.siteId; // todo: recheck this
       timesheetView.payrollId = ts.worker.payrollId;
       timesheetView.name = ts.worker.name;
       timesheetView.timesheetId = tse.timesheetId;
@@ -166,9 +168,144 @@ export class TimesheetService {
       timesheetView.finishDateTime = tse.finishDateTime;
       timesheetView.rowNumber = i;
       timesheetView.siteName = tse.site.name;
+
       return timesheetView;
     });
-    /* tslint:enable */
   }
 
+  async getTimesheet(when: Date, workerId: number, companyId: number): Promise<Timesheet> {
+    return await this.findOneWhere({
+      where: { workerId, companyId, startDateTime: { $lte: when }, finishDateTime: { $gt: when } },
+    });
+  }
+
+  async getTimesheetsAndTimesheetEntries(when: any, companyId: number): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          companyId,
+          startDateTime: { $lte: when },
+          finishDateTime: { $gt: when },
+        },
+        include: [{
+          model: TimesheetEntry,
+          required: true,
+          as: 'timesheetEntry',
+        }],
+      },
+    );
+  }
+
+  // DeleteTimesheetEntries: moved to timesheetEntry.service.ts file
+
+  async getDistinctTimesheets(companyId: number, workerId: number = null): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          workerId,
+          companyId,
+        },
+        include: [{
+          model: TimesheetEntry,
+          required: true,
+          as: 'timesheetEntry',
+        }],
+        limit: 100,
+        order: ['startDateTime'],
+      },
+    );
+  }
+
+  async countTimesheetsWithStatus(timesheetId: number, timesheetStatus: number, companyId: number): Promise<number> {
+    const timesheet = await this.findOneWhere(timesheetId);
+    return await this.TIMESHEET_REPOSITORY.count({
+      where: {
+        status: timesheetStatus,
+        startDateTime: timesheet.startDateTime.getDate(),
+        finishDateTime: timesheet.finishDateTime.getDate(),
+        companyId,
+      },
+    });
+  }
+
+  async setTimesheetStatus(timesheetId: number, timesheetStatus: number, companyId: number): Promise<void> {
+    const timesheet: Timesheet = await this.findOneWhere(timesheetId);
+    if (isNil(timesheet)) {
+      // todo:
+      // throw new SiteM8Exception($"Timesheet with ID of {timesheetId} could not be found.");
+    }
+    if (timesheet.companyId !== companyId) {
+      // todo:
+      // throw new SiteM8Exception("Timesheet not modified because it of different company Id");
+    }
+
+    if (timesheet.status === timesheetStatus) {
+      return;
+    } else if (timesheet.status === TimesheetStatus.Locked) {
+      // todo:
+      // throw new SiteM8Exception($"Timesheet with ID of {timesheetId} could not have status modified because it is locked.");
+    } else {
+      timesheet.status = timesheetStatus;
+      await timesheet.save();
+    }
+  }
+
+  async getUnlockedTimesheetsBySupervisorWorkerId(supervisorWorkerId: number, companyId: number): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          companyId,
+          status: { $ne: TimesheetStatus.Locked },
+        },
+        include: [{
+          model: Worker,
+          required: true,
+          as: 'worker',
+          where: { supervisor: supervisorWorkerId },
+        }],
+        order: ['startDateTime'],
+      },
+    );
+  }
+
+  async getUnlockedTimesheets(companyId: number): Promise<Timesheet[]> {
+    return await this.TIMESHEET_REPOSITORY.findAll<Timesheet>(
+      {
+        where: {
+          companyId,
+          status: { $ne: TimesheetStatus.Locked },
+        },
+        order: ['startDateTime'],
+      },
+    );
+  }
+
+  // AddDeleteUpdateTimesheetEntries: moved to timesheetentry.service.ts
+
+  // Returns list of timesheetId that are locked for which timesheetnote can be created by calling createTimesheetnoteForLockedTimesheets()
+  // createTimesheetnoteForLockedTimesheets : function in timesheetnotes
+  // LockTimesheet : This method can be used for locking single timesheet as well.
+  async LockTimesheets(timesheetIds: number[], companyId: number): Promise<number[]> {
+    const timesheetsUpdated = await this.TIMESHEET_REPOSITORY.update(
+      { status: TimesheetStatus.Locked },
+      {
+        where: {
+          timesheetId: timesheetIds,
+          status: TimesheetStatus.Approved,
+          companyId,
+          finishDateTime: { $gte: moment().utc() },
+        },
+      });
+    // Returns timesheet id's of updated rows
+    return timesheetsUpdated[1].map((m) => m.timesheetId);
+  }
+
+  // GetTimesheetEntries: moved to timesheetEntry.service.ys
+
+  // Returns true if the timesheet exists and is in the correct company. Returns false otherwise.
+  async isTimesheetExistForCompany(referenceTimesheetId: number, companyId: number): Promise<boolean> {
+    return (await this.TIMESHEET_REPOSITORY.count({ where: { timesheetId: referenceTimesheetId, companyId } })) > 0;
+  }
+
+  // OverwriteTimesheetEntries: Moved to timesheetentry.service.ts file
 }

@@ -45,24 +45,20 @@ export class SiteService {
       WHERE id NOT IN (${excludedIds.length ? excludedIds.join(",") : 0})
         AND company_id = ${companyId}
       ORDER BY
-        ST_DISTANCE(
-          site.geom,
-          ST_MakePoint(${lon}, ${lat})
-        )
-        ASC
+      ST_Distance_Sphere(
+        ST_SetSRID(site.geom, 4326),
+        ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326)
+      )
+      ASC
       LIMIT 1;
     `;
-    const res: any[] = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    if(!res[0].length) {
-      return null;
-    }
-    const answer: any = res[0][0];
-    return parseInt(answer['id']);
+    const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    return res[0].length ? parseInt(res[0][0]['id']) : null;
   }
 
   async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<number> {
     const sql = `
-      SELECT
+    SELECT
         ST_Distance_Sphere(
           ST_SetSRID(site.geom, 4326),
           ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326)
@@ -70,12 +66,8 @@ export class SiteService {
       FROM site where site.id = ${siteId}
       LIMIT 1;
     `
-    const res: any[] = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    if(!res[0].length) {
-      return null;
-    }
-    const answer: Object = res[0][0];
-    return parseFloat(answer['distance_meters']);
+    const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    return res[0].length ? parseFloat(res[0][0]['distance_meters']) : null;
   }
 
 }

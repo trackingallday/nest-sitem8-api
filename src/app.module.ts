@@ -3,6 +3,8 @@ import { AuthenticationMiddleware } from './common/authentication.middleware';
 import { DbUserMiddleware } from './common/dbuser.middlware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AccessTokenModule } from './accessToken/accessToken.module';
+import { CompanyModule } from './company/company.module';
 import { ItemsModule } from './items/items.module';
 import { SiteModule } from './site/site.module';
 import { TimesheetModule } from './timesheet/timesheet.module';
@@ -14,27 +16,28 @@ import { SiteAssignmentModule } from './siteAssignment/siteAssignment.module';
 import { LocationTimestampModule } from './locationTimestamp/locationTimestamp.module';
 import { DeviceModule } from './device/device.module';
 import { NotificationModule } from './notification/notification.module';
-import { AccessTokenModule } from './accessToken/accessToken.module';
+import { DatabaseModule } from './db/database.module';
 import { WorkerController } from './worker/worker.controller';
 import { ItemsController } from './items/items.controller';
-import { TimesheetController } from './timesheet/timesheet.controller';
-import { CompanyController } from './company/company.controller';
-import { WorkerAssignmentController } from './workerAssignment/workerAssignment.controller';
+import { WorkerService } from './worker/worker.service';
+
 
 @Module({
   imports: [
+    CompanyModule,
     ItemsModule,
     SiteModule,
     TimesheetEntryModule,
+    WorkerModule,
+    AccessTokenModule,
+    DatabaseModule,
     TimesheetModule,
     WorkerAssignmentModule,
-    WorkerModule,
     SiteAssignmentModule,
     LocationTimestampModule,
     NotificationModule,
     TimesheetNoteModule,
     DeviceModule,
-    AccessTokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],

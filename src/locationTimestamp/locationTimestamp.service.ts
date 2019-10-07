@@ -33,7 +33,7 @@ export class LocationTimestampService {
   }
 
   // GetLocationTimestamps(DateTime startInclusive, DateTime finishExclusive, string DeviceId, bool includeNullLocations)
-  async findByDeviceIdDateRange(startDate: Date, endDate: Date, deviceId: string) {
+  async findByDeviceIdDateRange(startDate: Date, endDate: Date, deviceId: string): Promise<LocationTimestamp[]> {
     const props = {
       where: {
         deviceId,
@@ -42,11 +42,14 @@ export class LocationTimestampService {
           [Op.lte]: endDate,
         },
       },
+      order:  [
+        ['location_date_time', 'DESC']
+      ],
     };
     return await this.findAllWhere(props);
   }
 
-  async findByCompanyIdDateRange(startDate: Date, endDate: Date, companyId: number) {
+  async findByCompanyIdDateRange(startDate: Date, endDate: Date, companyId: number): Promise<LocationTimestamp[]> {
     const props = {
       where: {
         companyId,
@@ -94,7 +97,7 @@ export class LocationTimestampService {
 
     ON q1.creation_date_time = q2.max_time
     `;
-    const res:any[] = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
+    const res:LocationTimestamp[] = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
       raw: false,
       type: QueryTypes.SELECT
     });
