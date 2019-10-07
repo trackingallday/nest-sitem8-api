@@ -40,9 +40,7 @@ describe('tests the LocationTimestampController', () => {
         return a.closestSiteDistance < b.closestSiteDistance ? -1 : 1;
       });
 
-      console.log(dsorted);
       expect(dsorted.map(d => d.closestSiteId).every(i => i === 1)).toBeTruthy();
-
       expect(Math.round(dsorted[0].closestSiteDistance)).toBe(expectedDistance0);
       expect(Math.round(dsorted[1].closestSiteDistance)).toBe(expectedDistance1);
       expect(Math.round(dsorted[2].closestSiteDistance)).toBe(expectedDistance2);

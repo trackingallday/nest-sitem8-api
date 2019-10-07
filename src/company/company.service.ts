@@ -30,7 +30,7 @@ export class CompanyService {
     return await this.COMPANY_REPOSITORY.findByPk<Company>(id);
   }
 
-  async updateCompany(props: Company): Promise<Company> {
+  async updateCompany(props: any): Promise<Company> {
     const company = await this.findById(props.id);
     await company.update(props);
     return company;

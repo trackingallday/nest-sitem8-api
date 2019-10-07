@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CompanyController } from '../src/company/company.controller';
 import { CompanyModule } from '../src/company/company.module';
 import { DatabaseModule } from '../src/db/database.module';
+import { CreateCompanyDto } from '../src/company/createcompany.dto';
+import { CompanyDto } from '../src/company/company.dto';
 import { mockPost, mockGet } from './httpUtils';
+import { CompanyInterface } from '../src/company/company.interface';
 
 
 // To mock classes using typescript follow this pattern exactly or it breaks
@@ -21,6 +24,7 @@ jest.mock('../src/common/auth0.gateway', function() {
 describe('tests the company controller', () => {
 
   let companyController: CompanyController;
+  let company: CompanyInterface;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -32,11 +36,47 @@ describe('tests the company controller', () => {
   describe('CRUD for company - make sure auth0 gets called', () => {
 
     it('creates a company - checks for user create', async () => {
-
+      const props : CreateCompanyDto = {
+        companyName: 'test company',
+        name: 'new admin man',
+        email: 'new@admin.com',
+        mobile: '+643254213542153', 
+      };
+      const data:any = await companyController.createcompany(
+        mockPost('/createcompany', props, { companyId: 1, isSuperAdministrator: true }), props);
+      expect(data.company.id).toBeTruthy();
+      expect(data.user.companyId).toBe(data.company.id);
+      expect(mockCreateUser).toBeCalled();
+      expect(data.user.email).toBe(props.email);
+      expect(data.company.name).toBe(props.companyName);
+      company = data.company;
     });
 
     it('gets all companies', async () => {
+      const allCompanies = await companyController.getAllCompanies();
+      expect(allCompanies.length).toBeGreaterThan(1);
+      expect(allCompanies.find(c => c.id === company.id)).toBeTruthy();
+    });
 
+    it('updates the new company', async () => {
+      const props : CompanyDto = { ...company, name: 'new company name' };
+      const updatedCompany:any = await companyController.updateCompany(
+        mockPost('/updatecompany', props, { companyId: props.id, isAdministrator: true }), props);
+      expect(updatedCompany.name).toBe('new company name');
+      expect(updatedCompany.id).toBe(company.id);
+    });
+
+    it('gets company by user', async () => {
+      const userCompany = await companyController.getCompany(
+        mockGet('/getcompany', { companyId: company.id, isEnabled: true }));
+      expect(userCompany.id).toBe(company.id);
+      expect(userCompany.name).toBe(company.name);
+    });
+
+    it('gets company name by user', async () => {
+      const userCompanyName = await companyController.getCompanyName(
+        mockGet('/companyname', { companyId: company.id, isEnabled: true }));
+      expect(userCompanyName).toBe(company.name);
     });
 
   });

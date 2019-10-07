@@ -1,6 +1,6 @@
 
 export class CompanyInterface {
-  readonly companyId: number;
+  readonly id: number;
   readonly name: string;
   readonly nextProcessingTime: Date;
   readonly startDayOfWeek: number;

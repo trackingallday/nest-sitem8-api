@@ -3,10 +3,13 @@ import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/comm
 import { CompanyService } from './company.service';
 import { WorkerService } from '../worker/worker.service';
 import { WorkerInterface } from '../worker/worker.interface';
+import Auth0Gateway from '../common/auth0.gateway';
 import { Company } from './company.entity';
+import { CompanyInterface } from './company.interface';
 import CompanyDto from './company.dto';
 import { CreateCompanyDto } from './createcompany.dto';
 import { ValidationPipe } from '../common/validation.pipe';
+import { isError } from 'util';
 
 
 @Controller('company')
@@ -25,23 +28,8 @@ export class CompanyController {
     return this.companyService.findById(parseInt(params.id));
   }
 
-  @Post()
-  @UsePipes(new ValidationPipe())
-  async create(@Body() company: CompanyDto) {
-    this.companyService.create(company);
-  }
-
-  @Post('/:id')
-  @UsePipes(new ValidationPipe())
-  async update(@Param() id: number, @Body() company: CompanyDto) {
-    const thisCompany = await this.companyService.findById(id);
-    thisCompany.set(company);
-    await thisCompany.save();
-    return thisCompany;
-  }
-
   @Get('companyname')
-  async GetCompanyName(@Req() req): Promise<string> {
+  async getCompanyName(@Req() req): Promise<string> {
     const company: Company = await this.companyService.findById(req.dbUser.companyId);
     return company.name;
   }
@@ -58,17 +46,16 @@ export class CompanyController {
 
   @Post('updatecompany')
   @UsePipes(new ValidationPipe())
-  async updateCompany(@Req() req, @Body() company: Company) {
-    company.companyId = req.dbUser.companyId;
-    await this.companyService.updateCompany(company);
-    return true;
+  async updateCompany(@Req() req, @Body() params: CompanyDto) {
+    const company = await this.companyService.updateCompany(params);
+    return company.toJSON();
   }
 
   @Post('createcompany')
   @UsePipes(new ValidationPipe())
-  async createcompany(@Body() companyParams: CreateCompanyDto) {
-    const company: Company = await this.companyService.addCompany(companyParams.name);
-    const worker: WorkerInterface = {
+  async createcompany(@Req() req, @Body() companyParams: CreateCompanyDto) {
+    const company: Company = await this.companyService.addCompany(companyParams.companyName);
+    const admin: WorkerInterface = {
       companyId: company.id,
       name:  companyParams.name,
       mobile: companyParams.mobile,
@@ -85,19 +72,24 @@ export class CompanyController {
       deviceId: null,
       base64Image: null,
       authId: null,
-    }
-    await this.workerService.create(worker);
-    return 'Success';
+    };
+    const user = await this.workerService.create(admin);
+    const authdata = await new Auth0Gateway().createUser(user.email);
+    const authedUser = await this.workerService.updateOne(user.id, 
+      { ...user.toJSON(),  authId: authdata.user_id });
+    return { user: authedUser.toJSON(), company: company.toJSON() };
   }
 
   @Get('getcompany')
-  async getCompany(@Req() req): Promise<Company> {
-    return await this.companyService.getCompanyByWorkerId(req.dbUser.companyId);
+  async getCompany(@Req() req): Promise<any> {
+    const company = await this.companyService.findById(req.dbUser.companyId);
+    return company.toJSON();
   }
 
   @Get('getallcompanies')
-  async getAllCompanies(): Promise<Company[]> {
-    return await this.companyService.findAll();
+  async getAllCompanies(): Promise<any> {
+    const companies = await this.companyService.findAll();
+    return companies.map(c => c.toJSON());
   }
 
   @Get('switchcompany/:id')
