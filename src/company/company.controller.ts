@@ -1,6 +1,8 @@
 
 import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/common';
 import { CompanyService } from './company.service';
+import { WorkerService } from '../worker/worker.service';
+import { WorkerInterface } from '../worker/worker.interface';
 import { Company } from './company.entity';
 import CompanyDto from './company.dto';
 import { CreateCompanyDto } from './createcompany.dto';
@@ -10,7 +12,8 @@ import { ValidationPipe } from '../common/validation.pipe';
 @Controller('company')
 export class CompanyController {
 
-  constructor(private readonly companyService: CompanyService) {}
+  constructor(private readonly companyService: CompanyService,
+    private readonly workerService: WorkerService) {}
 
   @Get()
   async findAll(): Promise<Company[]> {
@@ -39,7 +42,7 @@ export class CompanyController {
 
   @Get('companyname')
   async GetCompanyName(@Req() req): Promise<string> {
-    const company: Company = await this.companyService.findById( req.dbUser.companyId);
+    const company: Company = await this.companyService.findById(req.dbUser.companyId);
     return company.name;
   }
 
@@ -63,18 +66,27 @@ export class CompanyController {
 
   @Post('createcompany')
   @UsePipes(new ValidationPipe())
-  async createcompany( @Body() companyParams: CreateCompanyDto) {
+  async createcompany(@Body() companyParams: CreateCompanyDto) {
     const company: Company = await this.companyService.addCompany(companyParams.name);
-
-    // TODO:
-    // WorkerManager wm = new WorkerManager(user);
-    // Worker newCompanyAdmin = new Worker();
-    // newCompanyAdmin.Mobile = companyParams.mobile;
-    // newCompanyAdmin.Name = companyParams.name;
-    // newCompanyAdmin.Email = companyParams.email;
-    // newCompanyAdmin.CompanyId = c.CompanyId;
-    // wm.AddCompanyAdministrator(newCompanyAdmin);
-
+    const worker: WorkerInterface = {
+      companyId: company.id,
+      name:  companyParams.name,
+      mobile: companyParams.mobile,
+      email: companyParams.email,
+      payrollId: '0',
+      supervisor: null,
+      mobileNotifications: true,
+      emailNotifications: true,
+      isEnabled: true,
+      isWorker: false,
+      isSuperAdministrator: true,
+      isSupervisor: false,
+      isAdministrator: true,
+      deviceId: null,
+      base64Image: null,
+      authId: null,
+    }
+    await this.workerService.create(worker);
     return 'Success';
   }
 

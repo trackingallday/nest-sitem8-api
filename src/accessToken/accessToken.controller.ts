@@ -27,7 +27,5 @@ export class AccessTokenController {
     this.accessTokenService.create(accessToken);
   }
 
-
-
 }
 

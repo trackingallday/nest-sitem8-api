@@ -1,11 +1,9 @@
 
 import { Injectable, Inject } from '@nestjs/common';
 import { AccessToken } from './accessToken.entity';
-import { Worker } from '../worker/worker.entity';
 import { WorkerService } from '../worker/worker.service';
 import { AccessTokenInterface } from './accessToken.interface';
 import { createPassword } from '../common/global';
-import { Sequelize } from 'sequelize-typescript';
 import * as moment from 'moment';
 import { ACCESSTOKENCONSTANTS } from './constants';
 

@@ -1,4 +1,3 @@
-
 import { Injectable, Inject } from '@nestjs/common';
 import { Company } from './company.entity';
 import { CompanyInterface } from './company.interface';
@@ -31,17 +30,15 @@ export class CompanyService {
     return await this.COMPANY_REPOSITORY.findByPk<Company>(id);
   }
 
-  async updateCompany(props: Company): Promise<void> {
+  async updateCompany(props: Company): Promise<Company> {
     const company = await this.findById(props.id);
-    company.set(props);
-    await company.save();
+    await company.update(props);
+    return company;
   }
 
   async addCompany(companyName: string): Promise<Company> {
-    let company: Company = new Company();
-    company = await this.initialiseDefaultValues(company);
-    company.name = companyName;
-    return await this.COMPANY_REPOSITORY.create<Company>(company);
+    const props = this.initialiseDefaultValues();
+    return await this.COMPANY_REPOSITORY.create<Company>({ name: companyName, ...props });
   }
 
   // Also can be used for getCompanyName
@@ -58,26 +55,27 @@ export class CompanyService {
     return c;
   }
 
-  async initialiseDefaultValues(company: Company) {
-    company.startDayOfWeek = 1; // 0 = Sunday, 1 = Monday.
-    company.minimumWorkingDayDuration = '00:30:00';
-    company.workingDayEarliestStart = '05:45:00';
-    company.workingDayDefaultStart = '07:00:00';
-    company.workingDayLatestFinish = '18:00:00';
-    company.workingDayDefaultFinish = '16:00:00';
-    company.minimumLunchStart = '11:45:00';
-    company.defaultLunchStart = '12:00:00';
-    company.defaultLunchEnd = '12:30:00';
-    company.maximumLunchEnd = '13:15:00';
-    company.glitchRemovalPeriod = '00:08:00';
-    company.minimumWorkingTimeToRemoveLunchBreak = '05:30:00';
-    company.privateModeStart = '07:00:00';
-    company.privateModeFinish = '15:00:00';
-    company.dailyTimesheetProcessing = '19:00:00';
-    company.dailyApprovalReminder = '09:00:00';
-    company.nextProcessingTime = new Date();
-    company.nextApprovalReminderTime = new Date();
-
-    return company;
+  initialiseDefaultValues() {
+    return {
+      startDayOfWeek: 1, // 0 = Sunday, 1 = Monday.
+      minimumWorkingDayDuration : '00:30:00',
+      workingDayEarliestStart : '05:45:00',
+      workingDayDefaultStart : '07:00:00',
+      workingDayLatestFinish : '18:00:00',
+      workingDayDefaultFinish : '16:00:00',
+      minimumLunchStart : '11:45:00',
+      defaultLunchStart : '12:00:00',
+      defaultLunchEnd : '12:30:00',
+      maximumLunchEnd : '13:15:00',
+      glitchRemovalPeriod : '00:08:00',
+      minimumWorkingTimeToRemoveLunchBreak : '05:30:00',
+      privateModeStart : '07:00:00',
+      privateModeFinish : '15:00:00',
+      dailyTimesheetProcessing : '19:00:00',
+      dailyApprovalReminder : '09:00:00',
+      nextProcessingTime : new Date(),
+      nextApprovalReminderTime : new Date(),
+      customSettings: '',
+    };
   }
 }
