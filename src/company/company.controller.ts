@@ -3,7 +3,7 @@ import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/comm
 import { CompanyService } from './company.service';
 import { Company } from './company.entity';
 import CompanyDto from './company.dto';
-import { CreateCompanyParams } from './createcompany.dto';
+import { CreateCompanyDto } from './createcompany.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
 
@@ -63,7 +63,7 @@ export class CompanyController {
 
   @Post('createcompany')
   @UsePipes(new ValidationPipe())
-  async createcompany( @Body() companyParams: CreateCompanyParams) {
+  async createcompany( @Body() companyParams: CreateCompanyDto) {
     const company: Company = await this.companyService.addCompany(companyParams.name);
 
     // TODO:

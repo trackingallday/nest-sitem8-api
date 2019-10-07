@@ -6,7 +6,7 @@ import constants from '../constants'
 @Injectable()
 export class ItemsService {
 
-  @Inject(constants.repositories.items) private readonly ITEMS_REPOSITORY: typeof Item;
+  @Inject('ITEMS_REPOSITORY') private readonly ITEMS_REPOSITORY: typeof Item;
 
   async findAll(): Promise<Item[]> {
     const items = await this.ITEMS_REPOSITORY.findAll<any>();

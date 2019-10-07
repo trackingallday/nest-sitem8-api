@@ -39,7 +39,7 @@ export class SiteService {
     return item;
   }
 
-  async getClosestAssignedSiteId(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<any> {
+  async getClosestAssignedSiteId(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<number> {
     const sql = `
       SELECT id from site
       WHERE id NOT IN (${excludedIds.length ? excludedIds.join(",") : 0})
@@ -56,7 +56,7 @@ export class SiteService {
     return res[0].length ? parseInt(res[0][0]['id']) : null;
   }
 
-  async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<any> {
+  async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<number> {
     const sql = `
     SELECT
         ST_Distance_Sphere(
