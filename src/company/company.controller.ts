@@ -3,7 +3,7 @@ import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/comm
 import { CompanyService } from './company.service';
 import { Company } from './company.entity';
 import CompanyDto from './company.dto';
-import { CreateCompanyParams } from './company.interface';
+import { CreateCompanyParams } from './createcompany.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
 

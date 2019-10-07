@@ -24,10 +24,3 @@ export class CompanyInterface {
   readonly customSettings: string;
 }
 
-// tslint:disable-next-line:max-classes-per-file
-export class CreateCompanyParams {
-  readonly companyName: string;
-  readonly name: string;
-  readonly mobile: string;
-  readonly email: string;
-}

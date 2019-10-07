@@ -12,10 +12,7 @@ const expectedDistance1 = 18;
 const expectedDistance2 = 32;
 const expectedDistance3 = 35;
 
-<<<<<<< HEAD
-=======
 
->>>>>>> banika_notification
 describe('tests the LocationTimestampController', () => {
 
   let locController: LocationTimestampController;
