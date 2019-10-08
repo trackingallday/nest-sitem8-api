@@ -2,6 +2,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { AccessToken } from './accessToken.entity';
 import { WorkerService } from '../worker/worker.service';
+import { Worker } from '../worker/worker.entity';
 import { AccessTokenInterface } from './accessToken.interface';
 import { createPassword } from '../common/global';
 import * as moment from 'moment';
@@ -39,12 +40,13 @@ export class AccessTokenService {
   }
 
   async findById(id): Promise<AccessToken> {
-    return await this.ACCESSTOKEN_REPOSITORY.findByPk<AccessToken>(id);
+    return await this.ACCESSTOKEN_REPOSITORY.findByPk<AccessToken>(id, { include: [{model: Worker}]});
   }
 
   async getAccessToken(accessTokenId: string): Promise<AccessToken> {
     return await this.ACCESSTOKEN_REPOSITORY.findOne<AccessToken>({
       where: { accessTokenId },
+      include: [{model: Worker}],
     });
   }
 
@@ -68,7 +70,7 @@ export class AccessTokenService {
   async getWorkerFromAccessToken(accessTokenId: string): Promise<any> {
     const at: AccessToken = await this.getAccessToken(accessTokenId);
     if (this.checkAccessToken(at)) {
-      return await this.workerService.findById(at.workerId);
+      return at.worker;
     }
     return null;
   }
