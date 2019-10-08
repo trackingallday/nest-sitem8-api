@@ -1,6 +1,5 @@
 
 import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/common';
-import { LocationTimestampService } from './locationTimestamp.service';
 import { DeviceService } from '../device/device.service';
 import { SiteService } from '../site/site.service';
 import { SiteAssignmentService } from '../siteAssignment/siteAssignment.service';
