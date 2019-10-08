@@ -1,4 +1,3 @@
-
 import { Injectable, Inject } from '@nestjs/common';
 import { Op } from 'sequelize';
 import { Notification } from './notification.entity';
@@ -93,7 +92,7 @@ export class NotificationService {
       workerId: worker.id,
       category,
       description: description.length <= 160 ? description : description.substring(0, 160),
-      smsStatus: worker.mobileNotifications ? NotificationStatus.Pending : NotificationStatus.NotSent,
+      smsStatus: (worker.mobile && worker.mobileNotifications) ? NotificationStatus.Pending : NotificationStatus.NotSent,
       emailStatus: worker.email ? NotificationStatus.Pending : NotificationStatus.NotSent,
       emailAddress: worker.email && worker.email,
       mobileNumber: worker.mobile && worker.mobile,
