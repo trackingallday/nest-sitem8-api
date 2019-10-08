@@ -5,3 +5,5 @@ export class DeviceDto {
   @IsString() readonly deviceId: string;
   @IsNumber() readonly companyId: number;
 }
+
+

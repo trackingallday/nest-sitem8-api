@@ -2,7 +2,7 @@
 import { Get, Post, Body, Param, Controller, UsePipes  } from '@nestjs/common';
 import { DeviceService } from './device.service';
 import { Device } from './device.entity';
-import DeviceDto from './device.dto';
+import { DeviceDto } from './device.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
 

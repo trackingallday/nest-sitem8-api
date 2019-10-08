@@ -6,7 +6,8 @@ export class DbUserMiddleware implements NestMiddleware {
 
   constructor(private readonly workerService: WorkerService) {}
 
-  async use(req, res, next) {
+  //req is an express object - but we use any to make typscript not flip out
+  async use(req:any, res: Response, next:Function) {
     if(req.user) {
       const params = { authId: req.user.sub };
       const dbUser = await this.workerService.findOneWhere({ where: params });

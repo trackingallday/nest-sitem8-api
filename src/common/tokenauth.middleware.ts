@@ -7,12 +7,12 @@ export class AuthenticationMiddleware implements NestMiddleware {
 
   constructor(private readonly accessTokenService: AccessTokenService) {}
 
-  //req is an express object - but we use any to 
+  //req is an express object - but we use any to make typscript not flip out
   async use(req:any, res: Response, next: Function) {
     const parts = req.path.split('/');
     const token = parts[parts.length - 1];
     const dbUser = await this.accessTokenService.getWorkerFromAccessToken(token);
-    if(!dbUser) {
+    if(!(dbUser && dbUser.isEnabled)) {
       throw new Error('Not Authorised');
     }
     req.dbUser = dbUser.toJSON();
