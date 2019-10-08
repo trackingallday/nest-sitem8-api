@@ -6,11 +6,11 @@ import { Company } from '../company/company.entity';
 import { DayOfWeek, TimesheetStatus } from './constants';
 import { Worker } from '../worker/worker.entity';
 import * as momenttz from 'moment-timezone';
-import { Op, Model } from 'sequelize';
 import * as moment from 'moment';
 import { Sequelize } from 'sequelize-typescript';
 import { isNil } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
+import { Site } from '../site/site.entity';
 
 @Injectable()
 export class TimesheetService {
@@ -230,20 +230,9 @@ export class TimesheetService {
 
   async setTimesheetStatus(timesheetId: number, timesheetStatus: number, companyId: number): Promise<void> {
     const timesheet: Timesheet = await this.findOneWhere(timesheetId);
-    if (isNil(timesheet)) {
-      // todo:
-      // throw new SiteM8Exception($"Timesheet with ID of {timesheetId} could not be found.");
-    }
-    if (timesheet.companyId !== companyId) {
-      // todo:
-      // throw new SiteM8Exception("Timesheet not modified because it of different company Id");
-    }
 
     if (timesheet.status === timesheetStatus) {
       return;
-    } else if (timesheet.status === TimesheetStatus.Locked) {
-      // todo:
-      // throw new SiteM8Exception($"Timesheet with ID of {timesheetId} could not have status modified because it is locked.");
     } else {
       timesheet.status = timesheetStatus;
       await timesheet.save();
