@@ -41,20 +41,6 @@ export class CompanyService {
     return await this.COMPANY_REPOSITORY.create<Company>({ name: companyName, ...props });
   }
 
-  // Also can be used for getCompanyName
-  // getCompany
-  // todo: This method is duplicate. Can be removed as well.
-  async getCompanyByWorkerId(workerCompanyId: number): Promise<Company> {
-    return await this.findById(workerCompanyId);
-  }
-
-  async updateCompanyCustomSettings(companyId: number, customSettingsJson: string): Promise<Company> {
-    const c: Company = await this.findById(companyId);
-    c.customSettings = customSettingsJson;
-    this.updateCompany(c);
-    return c;
-  }
-
   initialiseDefaultValues() {
     return {
       startDayOfWeek: 1, // 0 = Sunday, 1 = Monday.

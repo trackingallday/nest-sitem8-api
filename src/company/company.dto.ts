@@ -3,6 +3,8 @@ import { IsString, IsInt, IsOptional, IsNumber, IsDate, IsBoolean } from 'class-
 
 export class CompanyDto {
 
+  @IsOptional() readonly id: number;
+
   @IsNumber() readonly companyId: number;
 
   @IsString() readonly name: string;
