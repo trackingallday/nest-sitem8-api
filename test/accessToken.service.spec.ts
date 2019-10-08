@@ -45,7 +45,6 @@ describe('tests the Access Token', () => {
       expect(actoken.id).toBe(1);
     });
 
-
   });
 
 });
