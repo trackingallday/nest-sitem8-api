@@ -12,28 +12,30 @@ export class DeviceController {
   constructor(private readonly deviceService: DeviceService) {}
 
   @Get()
-  async findAll(): Promise<Device[]> {
-    return this.deviceService.findAll();
+  async findAll(): Promise<any[]> {
+    const res = await this.deviceService.findAll();
+    return res.map(r => r.toJSON());
   }
 
   @Get('/:id')
-  async findById(@Param() params): Promise<Device> {
-    return this.deviceService.findById(parseInt(params.id));
+  async findById(@Param() id:number) {
+    const device = await this.deviceService.findById(id);
+    return device.toJSON();
   }
 
   @Post()
   @UsePipes(new ValidationPipe())
   async create(@Body() device: DeviceDto) {
-    this.deviceService.create(device);
+    const res = await this.deviceService.create(device);
+    return res.toJSON();
   }
 
   @Post('/:id')
   @UsePipes(new ValidationPipe())
   async update(@Param() id: number, @Body() device: DeviceDto) {
     const thisDevice = await this.deviceService.findById(id);
-    thisDevice.set(device);
-    await thisDevice.save();
-    return thisDevice;
+    const res = await thisDevice.update(device);
+    return res.toJSON();
   }
 }
 

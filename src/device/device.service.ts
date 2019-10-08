@@ -1,7 +1,7 @@
 
 import { Injectable, Inject } from '@nestjs/common';
 import { Device } from './device.entity';
-import { DeviceInterface } from './device.interface';
+import { DeviceDto } from './device.dto';
 import constants from '../constants'
 
 @Injectable()
@@ -13,7 +13,7 @@ export class DeviceService {
     return await this.DEVICE_REPOSITORY.findAll<Device>();
   }
 
-  async create(props: DeviceInterface): Promise<Device> {
+  async create(props: DeviceDto): Promise<Device> {
     return await this.DEVICE_REPOSITORY.create<Device>(props);
   }
 
