@@ -3,10 +3,11 @@ import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/comm
 import { CompanyService } from './company.service';
 import { WorkerService } from '../worker/worker.service';
 import { WorkerInterface } from '../worker/worker.interface';
+import { AccessTokenService } from '../accessToken/accessToken.service';
 import Auth0Gateway from '../common/auth0.gateway';
 import { Company } from './company.entity';
 import { CompanyInterface } from './company.interface';
-import CompanyDto from './company.dto';
+import { CompanyDto } from './company.dto';
 import { CreateCompanyDto } from './createcompany.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 import { isError } from 'util';
@@ -16,7 +17,9 @@ import { isError } from 'util';
 export class CompanyController {
 
   constructor(private readonly companyService: CompanyService,
-    private readonly workerService: WorkerService) {}
+    private readonly workerService: WorkerService,
+    private readonly accessTokenService: AccessTokenService,
+    ) {}
 
   @Get()
   async findAll(): Promise<Company[]> {
@@ -34,15 +37,12 @@ export class CompanyController {
     return company.name;
   }
 
-  // Todo
-  // [Route("company/{token}")]
-  // [HttpGet]
-  // [AllowAnonymous]
-  // public ContentResult GetCompany(string token)
-  // {
-  //     var worker = AccessTokenManager.GetWorkerFromAccessToken(token);
-  //     return ToJSON(new CompanyManager(worker).GetCompany());
-  // }
+  @Get('company/:token')
+  async getCompanyFromToken(@Req() req, @Param() token:string) {
+    const user = await this.accessTokenService.getWorkerFromAccessToken(token);
+    const company = await this.companyService.findById(user.companyId);
+    return company.toJSON();
+  }
 
   @Post('updatecompany')
   @UsePipes(new ValidationPipe())
@@ -75,7 +75,7 @@ export class CompanyController {
     };
     const user = await this.workerService.create(admin);
     const authdata = await new Auth0Gateway().createUser(user.email);
-    const authedUser = await this.workerService.updateOne(user.id, 
+    const authedUser = await this.workerService.updateOne(user.id,
       { ...user.toJSON(),  authId: authdata.user_id });
     return { user: authedUser.toJSON(), company: company.toJSON() };
   }
@@ -90,14 +90,6 @@ export class CompanyController {
   async getAllCompanies(): Promise<any> {
     const companies = await this.companyService.findAll();
     return companies.map(c => c.toJSON());
-  }
-
-  @Get('switchcompany/:id')
-  @UsePipes(new ValidationPipe())
-  async switchCompany(@Param() id: number) {
-    // todo:
-    // await this.workerService.switchCompany(LoggedInWorkerId(), id);
-    return true;
   }
 
 }

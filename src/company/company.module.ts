@@ -5,9 +5,10 @@ import { CompanyService } from './company.service';
 import { CompanyProvider } from './company.provider';
 import { DatabaseModule } from '../db/database.module';
 import { WorkerModule } from '../worker/worker.module';
+import { AccessTokenModule } from '../accessToken/accessToken.module';
 
 @Module({
-  imports: [DatabaseModule, WorkerModule],
+  imports: [DatabaseModule, AccessTokenModule, WorkerModule],
   controllers: [CompanyController],
   providers: [
     CompanyService,
