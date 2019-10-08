@@ -46,4 +46,11 @@ export class WorkerController {
     const res = await this.workerService.getEnabledSupervisors(companyId);
     return res;
   }
+
+  @Get('switchcompany/:id')
+  @UsePipes(new ValidationPipe())
+  async switchCompany(@Req() req, @Param() id: number) {
+    await this.workerService.switchCompany(req.dbUser.id, id);
+    return true;
+  }
 }
