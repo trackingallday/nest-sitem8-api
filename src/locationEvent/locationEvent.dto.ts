@@ -1,7 +1,7 @@
 
 import { IsString, IsNumber } from 'class-validator';
 
-export default class LocationTimestampDto {
+export class LocationEventDto {
 
   @IsString() readonly eventType: string;
 
