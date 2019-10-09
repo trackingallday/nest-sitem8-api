@@ -14,6 +14,7 @@ import { WorkerModule } from './worker/worker.module';
 import { WorkerAssignmentModule } from './workerAssignment/workerAssignment.module';
 import { SiteAssignmentModule } from './siteAssignment/siteAssignment.module';
 import { LocationTimestampModule } from './locationTimestamp/locationTimestamp.module';
+import { LocationEventModule } from './locationEvent/locationEvent.module';
 import { DeviceModule } from './device/device.module';
 import { NotificationModule } from './notification/notification.module';
 import { DatabaseModule } from './db/database.module';
@@ -25,7 +26,7 @@ import { ItemsController } from './items/items.controller';
   imports: [
     CompanyModule,
     ItemsModule,
-    /*SiteModule,
+    SiteModule,
     TimesheetEntryModule,
     WorkerModule,
     AccessTokenModule,
@@ -36,7 +37,8 @@ import { ItemsController } from './items/items.controller';
     LocationTimestampModule,
     NotificationModule,
     TimesheetNoteModule,
-    DeviceModule,*/
+    DeviceModule,
+    LocationEventModule,
   ],
   controllers: [AppController],
   providers: [AppService],
