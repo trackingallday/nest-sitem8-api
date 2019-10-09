@@ -5,6 +5,7 @@ import  { AccessToken } from '../accessToken/accessToken.entity';
 import  { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
 import  { Device } from '../device/device.entity';
 import  { LocationTimestamp } from '../locationTimestamp/locationTimestamp.entity';
+import  { LocationEvent } from '../locationEvent/locationEvent.entity';
 import  { Notification } from '../notification/notification.entity';
 import { TimesheetNote } from '../timesheetNote/timesheetNote.entity';
 import  { Site } from '../site/site.entity';
@@ -37,6 +38,7 @@ export const databaseProviders = [
         DayOfWeekTimeSetting,
         WorkerAssignment,
         Device,
+        LocationEvent,
         LocationTimestamp,
         Notification,
         Site,
@@ -50,7 +52,7 @@ export const databaseProviders = [
           DECIMAL: { ...DataType.DECIMAL, parse: v => (v === null) ? v : parseFloat(v) },
         });
       });
-      
+
       await sequelize.sync();
       return sequelize;
     },

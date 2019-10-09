@@ -8,9 +8,11 @@ import { WorkerModule } from '../worker/worker.module';
 import { SiteModule } from '../site/site.module';
 import { SiteAssignmentModule } from '../siteAssignment/siteAssignment.module';
 import { DeviceModule } from '../device/device.module';
+import { LocationEventModule } from '../locationEvent/locationEvent.module';
+
 
 @Module({
-  imports: [DatabaseModule, SiteModule, SiteAssignmentModule, DeviceModule, WorkerModule],
+  imports: [DatabaseModule, SiteModule, SiteAssignmentModule, LocationEventModule, DeviceModule, WorkerModule],
   controllers: [LocationTimestampController],
   providers: [
     LocationTimestampService,

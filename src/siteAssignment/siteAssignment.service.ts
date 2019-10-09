@@ -3,6 +3,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { SiteAssignment } from './siteAssignment.entity';
 import { SiteAssignmentInterface } from './siteAssignment.interface';
 import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
+import { Company } from '../company/company.entity';
 import { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
 import WorkerAssignmentDto from 'src/workerAssignment/workerAssignment.dto';
 import { WorkerAssignmentStatus } from '../common/enums';
@@ -14,6 +15,8 @@ export class SiteAssignmentService {
   @Inject('SITEASSIGNMENT_REPOSITORY') private readonly SITEASSIGNMENT_REPOSITORY: typeof SiteAssignment;
   @Inject('DAYOFWEEKTIMESETTING_REPOSITORY') private readonly DAYOFWEEKTIMESETTING_REPOSITORY: typeof DayOfWeekTimeSetting;
   @Inject('WORKERASSIGNMENT_REPOSITORY') private readonly WORKERASSIGNMENT_REPOSITORY: typeof WorkerAssignment;
+  //@Inject('COMPANY_REPOSITORY') private readonly COMPANY_REPOSITORY: typeof Company;
+
 
   async attachRelated(siteAssignment: SiteAssignment): Promise<any> {
     const params = { where: { siteAssignmentId: siteAssignment.id }};
@@ -48,8 +51,10 @@ export class SiteAssignmentService {
     SELECT sa.site_id
     FROM workerassignment wa join siteassignment sa
       ON wa.site_assignment_id = sa.id
-    WHERE wa.worker_id = ${workerId} and sa.archived = false
-      and not wa.assigned_status = 0;
+    WHERE wa.worker_id = ${workerId}
+      and sa.archived = false
+      and (not wa.assigned_status = 1
+      or (wa.assigned_status = 0 or sa.can_add_worker_from_location_timestamp = false))
     `;
     const res = await this.SITEASSIGNMENT_REPOSITORY.sequelize.query(sql, { raw: true });
     return res[0];

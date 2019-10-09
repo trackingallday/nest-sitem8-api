@@ -16,7 +16,8 @@ import { isError } from 'util';
 @Controller('company')
 export class CompanyController {
 
-  constructor(private readonly companyService: CompanyService,
+  constructor(
+    private readonly companyService: CompanyService,
     private readonly workerService: WorkerService,
     private readonly accessTokenService: AccessTokenService,
     ) {}

@@ -14,5 +14,6 @@ import { AccessTokenModule } from '../accessToken/accessToken.module';
     CompanyService,
     ...CompanyProvider,
   ],
+  exports: [CompanyService],
 })
 export class CompanyModule {}

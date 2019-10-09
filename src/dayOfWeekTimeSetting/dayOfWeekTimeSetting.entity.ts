@@ -1,5 +1,6 @@
 
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { SiteAssignment } from '../siteAssignment/siteAssignment.entity';
 
 @Table({ tableName: 'dayofweektimesetting', modelName: 'dayofweektimesetting', underscored: true })
 export class DayOfWeekTimeSetting extends Model<DayOfWeekTimeSetting> {
@@ -7,6 +8,7 @@ export class DayOfWeekTimeSetting extends Model<DayOfWeekTimeSetting> {
   @Column(DataType.INTEGER)
   dayOfWeekTimeSettingId: number;
 
+  @ForeignKey(() => SiteAssignment)
   @Column(DataType.INTEGER)
   siteAssignmentId: number;
 
@@ -36,6 +38,9 @@ export class DayOfWeekTimeSetting extends Model<DayOfWeekTimeSetting> {
 
   @Column(DataType.STRING)
   maximumLunchEnd: string;
+
+  @BelongsTo(() => SiteAssignment, 'siteAssignmentId')
+  siteAssignment: SiteAssignment;
 
 }
 

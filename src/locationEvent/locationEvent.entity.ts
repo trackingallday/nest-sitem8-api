@@ -1,5 +1,5 @@
 
-import { Table, Column, Model, DataType, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { LocationTimestamp } from '../locationTimestamp/locationTimestamp.entity'
 
 @Table({ tableName: 'locationevent', modelName: 'locationevent', underscored: true })
@@ -8,6 +8,7 @@ export class LocationEvent extends Model<LocationEvent> {
   @Column(DataType.ENUM('enter_site', 'exit_site', 'on_site', 'off_site'))
   eventType: string;
 
+  @ForeignKey(() => LocationTimestamp)
   @Column(DataType.INTEGER)
   locationTimestampId: number;
 

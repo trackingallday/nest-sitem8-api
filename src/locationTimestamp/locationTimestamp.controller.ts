@@ -1,6 +1,7 @@
 
-import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/common';
+import { Get, Post, Body, Param, Controller, UsePipes, Req, Inject, forwardRef  } from '@nestjs/common';
 import { LocationTimestampService } from './locationTimestamp.service';
+import { LocationEventService } from '../locationEvent/locationEvent.service';
 import { DeviceService } from '../device/device.service';
 import { SiteService } from '../site/site.service';
 import { SiteAssignmentService } from '../siteAssignment/siteAssignment.service';
@@ -19,6 +20,8 @@ export class LocationTimestampController {
     private readonly siteService: SiteService,
     private readonly siteAssignmentService: SiteAssignmentService,
     private readonly workerService: WorkerService,
+    @Inject(forwardRef(() => LocationEventService))
+    private readonly locationEventService: LocationEventService,
     ) {
 
     }
@@ -42,9 +45,14 @@ export class LocationTimestampController {
 
     const closestSiteDistance = await this.siteService.getDistanceToSite(
       closestSiteId, loc.latitude, loc.longitude);
+
     const device = await this.deviceService.findOneWhere({ where: { deviceId: loc.deviceId } });
     const fullLoc = { ...loc, closestSiteId, closestSiteDistance, workerId: worker.id, deviceId: device.id };
+
     const res = await this.locationTimestampService.create(fullLoc);
+
+    const locationEvent = await this.locationEventService.create(fullLoc);
+
     return res.toJSON();
   }
 

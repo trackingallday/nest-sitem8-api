@@ -1,14 +1,29 @@
 
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, HasOne } from 'sequelize-typescript';
+import { Worker } from '../worker/worker.entity';
+import { Device } from '../device/device.entity';
+import { LocationEvent } from '../locationEvent/locationEvent.entity';
+
 
 @Table({ tableName: 'locationtimestamp', modelName: 'locationtimestamp', underscored: true })
 export class LocationTimestamp extends Model<LocationTimestamp> {
 
+  @ForeignKey(() => Device)
   @Column(DataType.STRING)
   deviceId: string;
 
+  @BelongsTo(() => Worker)
+  device: Device;
+
+  @ForeignKey(() => Worker)
   @Column(DataType.INTEGER)
   workerId: number;
+
+  @BelongsTo(() => Worker)
+  worker: Worker;
+
+  @HasOne(() => LocationEvent)
+  locationEvent: LocationEvent;
 
   @Column(DataType.DATE)
   creationDateTime: Date;

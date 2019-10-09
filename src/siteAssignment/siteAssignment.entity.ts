@@ -1,5 +1,7 @@
 
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
+import { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
 
 @Table({ tableName: 'siteassignment', modelName: 'siteassignment', underscored: true })
 export class SiteAssignment extends Model<SiteAssignment> {
@@ -22,7 +24,10 @@ export class SiteAssignment extends Model<SiteAssignment> {
   @Column(DataType.BOOLEAN)
   canAddWorkerFromLocationTimestamp: boolean;
 
-  workerAssignments: any;
-  dayOfWeekTimeSettings: any;
+  @HasMany(() => WorkerAssignment)
+  workerAssignments: WorkerAssignment[];
+
+  @HasMany(() => DayOfWeekTimeSetting)
+  dayOfWeekTimeSettings: DayOfWeekTimeSetting[];
 }
 
