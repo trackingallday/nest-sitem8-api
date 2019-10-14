@@ -2,7 +2,7 @@
 
 export function genLocationTimestamp(deviceId: string, lat: number, lon: number, index) {
   const date = new Date();
-  date.setMinutes(new Date().getMinutes() - index * 5)
+  date.setMinutes(new Date().getMinutes() - (index + 10))
   return {
      deviceId: deviceId,
      creationDateTime: date,
