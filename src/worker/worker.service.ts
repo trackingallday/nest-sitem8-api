@@ -1,8 +1,9 @@
 
 import { Injectable, Inject } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { Worker } from './worker.entity';
 import { WorkerInterface } from './worker.interface';
-import constants from '../constants'
+import constants from '../constants';
 
 @Injectable()
 export class WorkerService {
@@ -13,12 +14,12 @@ export class WorkerService {
     return await this.WORKER_REPOSITORY.findAll<Worker>();
   }
 
-  //AddWorker
+  // AddWorker
   async create(props: WorkerInterface): Promise<Worker> {
     return await this.WORKER_REPOSITORY.create<Worker>(props);
   }
 
-  //GetAllUsersAllCompanies
+  // GetAllUsersAllCompanies //GetEnabledSupervisors
   async findAllWhere(props): Promise<Worker[]> {
     return await this.WORKER_REPOSITORY.findAll<Worker>(props);
   }
@@ -27,30 +28,46 @@ export class WorkerService {
     return await this.WORKER_REPOSITORY.findOne<Worker>(props);
   }
 
-  //GetWorker GetWorkerAnyCompany
+  // GetWorker GetWorkerAnyCompany
   async findById(id): Promise<Worker> {
     return await this.WORKER_REPOSITORY.findByPk<Worker>(id);
   }
 
-  async updateWorker(id: number, workerProps: any): Promise<Worker> {
-    const worker = await this.findById(workerProps);
-    worker.set(workerProps);
-    await worker.save();
+  async updateOne(id: number, props: any): Promise<Worker> {
+    const worker = await this.findById(id);
+    await worker.update(props);
     return worker;
   }
 
+  async updateWorker(id: number, props: any): Promise<Worker> {
+    return this.updateOne(id, props);
+  }
+
   async getEnabledSupervisors(companyId: number): Promise<Worker[]> {
-    return await this.findAllWhere(
-      { isEnabled: true, isSupervisor: true, companyId });
+    const params = {
+      where: {
+        isEnabled: true,
+        isSupervisor: true,
+        companyId,
+      },
+    };
+    return await this.findAllWhere(params);
   }
 
   async getWorkerByDeviceId(deviceId: number): Promise<Worker> {
     return await this.findOneWhere({ deviceId });
   }
 
-  //GetAllUsers
-  async getWorkersByCompany(companyId: number): Promise<Worker[]> {
-    return await this.findAllWhere({ companyId });
+  async getWorkerByCompanyIdAndWorkerId(companyId: number, workerId: number): Promise<Worker> {
+    return await this.findOneWhere({ companyId, workerId });
+  }
+
+  // GetAllUsers
+  async getWorkersByCompany(companyId: number, isAdmin: boolean): Promise<Worker[]> {
+    const workers = isAdmin ? await this.findAllWhere({ where: { companyId } }) :
+      await this.findAllWhere({ where: { companyId }, attributes: ['workerId', 'name'] });
+
+    return workers;
   }
 
   async switchCompany(workerId: number, companyId: number): Promise<Worker> {
@@ -58,9 +75,7 @@ export class WorkerService {
   }
 
   async getWorkerByAuthId(authId: string): Promise<Worker> {
-    return await this.findOneWhere({ authId });
+    return await this.findOneWhere({ where: { authId }});
   }
 
 }
-
-

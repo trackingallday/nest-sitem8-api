@@ -1,10 +1,9 @@
 
-import { Get, Post, Body, Param, Controller, UsePipes  } from '@nestjs/common';
+import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { Notification } from './notification.entity';
 import NotificationDto from './notification.dto';
 import { ValidationPipe } from '../common/validation.pipe';
-
 
 @Controller('notification')
 export class NotificationController {
@@ -35,5 +34,10 @@ export class NotificationController {
     await thisNotification.save();
     return thisNotification;
   }
-}
 
+  @Get('/:id')
+  async getNotifications(@Param() id: number): Promise<Notification[]> {
+    return await this.notificationService.getNotifications(id);
+  }
+
+}

@@ -12,4 +12,3 @@ export class NotificationInterface {
   readonly mobileNumber: string;
   readonly emailAddress: string;
 }
-  

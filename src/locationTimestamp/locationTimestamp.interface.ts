@@ -1,6 +1,5 @@
 
 export class LocationTimestampInterface {
-  readonly locationTimestampId: number;
   readonly deviceId: string;
   readonly workerId: number;
   readonly creationDateTime: Date;
@@ -13,7 +12,6 @@ export class LocationTimestampInterface {
   readonly rawData: string;
   readonly charging: boolean;
   readonly sosButton: boolean;
-  readonly signalStrength: number;
   readonly altitude: number;
   readonly companyId: number;
   readonly geom: any;

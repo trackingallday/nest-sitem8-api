@@ -1,0 +1,16 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "globalSetup": "<rootDir>/setup.ts",
+  "globalTeardown": "<rootDir>/teardown.ts",
+  "globals": {
+    "ts-jest": {
+      "diagnostics": false
+    }
+  }
+}

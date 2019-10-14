@@ -9,11 +9,11 @@ import { ValidationPipe } from '../common/validation.pipe';
 @Controller('items')
 export class ItemsController {
 
-  constructor(private readonly itemsService: ItemsService) {}
+  constructor(private readonly itemsService: ItemsService) {
+  }
 
   @Get()
   async findAll(@Req() req): Promise<Item[]> {
-    console.log("***********", req.dbUser, "*****************************");
     return this.itemsService.findAll();
   }
 

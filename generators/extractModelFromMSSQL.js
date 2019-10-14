@@ -1,4 +1,4 @@
-const utils = require('../utils/strUtils');
+const utils = require('../src/utils/strUtils');
 const translateMSSQLType = require('./translateMSSQLTypeToJsType');
 const translateMSSQLTypeToSequelizeType = require('./translateMSSQLTypeToSequelizeType');
 const translateJSTypeToValidator = require('./translateJSTypeToValidator');

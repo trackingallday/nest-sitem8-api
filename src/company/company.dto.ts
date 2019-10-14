@@ -1,7 +1,9 @@
 
 import { IsString, IsInt, IsOptional, IsNumber, IsDate, IsBoolean } from 'class-validator';
 
-export default class CompanyDto {
+export class CompanyDto {
+
+  @IsOptional() readonly id: number;
 
   @IsNumber() readonly companyId: number;
 

@@ -12,5 +12,8 @@ import { DatabaseModule } from '../db/database.module';
     DeviceService,
     ...DeviceProvider,
   ],
+  exports: [
+    DeviceService,
+  ],
 })
 export class DeviceModule {}

@@ -12,5 +12,6 @@ import { DatabaseModule } from '../db/database.module';
     SiteService,
     ...SiteProvider,
   ],
+  exports: [SiteService],
 })
 export class SiteModule {}
