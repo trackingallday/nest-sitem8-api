@@ -65,7 +65,7 @@ export class SiteService {
       ) AS distance_meters
       FROM site where site.id = ${siteId}
       LIMIT 1;
-    `
+    `;
     const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
     return res[0].length ? parseFloat(res[0][0]['distance_meters']) : null;
   }
