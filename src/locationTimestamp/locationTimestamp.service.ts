@@ -80,7 +80,7 @@ export class LocationTimestampService {
     return await this.findOneWhere(props);
   }
 
-  // Typescript doesnt know that the toCamel will make them 
+  // Typescript doesnt know that the toCamel will make them
   async getLatestByWorkerIds(workerIds: number[]): Promise<any[]> {
     if(!workerIds.length) {
       return [];

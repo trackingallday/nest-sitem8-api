@@ -2,19 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LocationTimestampService } from '../src/locationTimestamp/locationTimestamp.service';
 import { LocationTimestampModule } from '../src/locationTimestamp/locationTimestamp.module';
 import { DatabaseModule } from '../src/db/database.module';
-import { All } from '@nestjs/common';
 import moment = require('moment');
-
-
-let mockCreatePassword = jest.fn();
-mockCreatePassword.mockReturnValue("password");
-
-jest.mock('../src/common/global', function() {
-  return { createPassword: jest.fn().mockImplementation(() => {
-    return mockCreatePassword();
-  })
-  }
-});
 
 
 describe('tests the Location Timstamp Service', () => {
@@ -41,15 +29,15 @@ describe('tests the Location Timstamp Service', () => {
     });
 
     it('checks findByCompanyIdDateRange', async () => {
-      const allLocs = await locService.findAll();
+      const allLocs = await locService.findAllWhere({ where: { deviceId: '32q453453145345' }})
       allLocs.sort((a, b) => {
         return moment(a.locationDateTime).isAfter(moment(b.locationDateTime)) ? 1 : -1;
       });
       const startDate = allLocs[1].locationDateTime;
       const endDate = allLocs[3].locationDateTime;
       const inRange = await locService.findByCompanyIdDateRange(startDate, endDate, 1);
-      expect(inRange.length).toBe(3);
 
+      expect(inRange.length).toBe(3);
       expect(allLocs[2].locationDateTime.getTime()).toBeGreaterThan(
         inRange[inRange.length - 1].locationDateTime.getTime());
 

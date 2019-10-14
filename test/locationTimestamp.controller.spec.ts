@@ -29,18 +29,19 @@ describe('tests the LocationTimestampController', () => {
     it('creates some locations testing (also tests site service -> getClosestSite and getDistanceToSite)', async () => {
 
       const locs = testconstants.nearOrbicaPoints.map((c, i) => {
-        return genLocationTimestamp(testconstants.device.deviceId, c[1], c[0], i);
+        // -120 to put these into the future so no overlap
+        return genLocationTimestamp(testconstants.device.deviceId, c[1], c[0], i - 120);
       });
 
       const data = await Promise.all(locs.map(
         async l => await locController.create(
           mockPost('/locationtimestamp', l, { companyId: 1, id: 1 }), l)));
 
-      const dsorted = data.sort((a, b) => {
+      const dsorted:any[] = data.sort((a:any, b:any) => {
         return a.closestSiteDistance < b.closestSiteDistance ? -1 : 1;
       });
 
-      expect(dsorted.map(d => d.closestSiteId).every(i => i === 1)).toBeTruthy();
+      expect(dsorted.map((d:any) => d.closestSiteId).every(i => i === 1)).toBeTruthy();
       expect(Math.round(dsorted[0].closestSiteDistance)).toBe(expectedDistance0);
       expect(Math.round(dsorted[1].closestSiteDistance)).toBe(expectedDistance1);
       expect(Math.round(dsorted[2].closestSiteDistance)).toBe(expectedDistance2);

@@ -1,8 +1,7 @@
 
 import { LocationEvent } from './locationEvent.entity';
-import { Company } from '../company/company.entity';
 import { SiteAssignment } from '../siteAssignment/siteAssignment.entity';
-
+import { LocationTimestamp } from '../locationTimestamp/locationTimestamp.entity';
 
 export const LocationEventProvider = [
   {
@@ -10,8 +9,8 @@ export const LocationEventProvider = [
     useValue: LocationEvent,
   },
   {
-    provide: 'COMPANY_REPOSITORY',
-    useValue: Company,
+    provide: 'LOCATIONTIMESTAMP_REPOSITORY',
+    useValue: LocationTimestamp,
   },
   {
     provide: 'SITEASSIGNMENT_REPOSITORY',
