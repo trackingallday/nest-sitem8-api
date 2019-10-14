@@ -1,4 +1,4 @@
-const { capitalise } = require('../utils/strUtils');
+const { capitalise } = require('../src/utils/strUtils');
 
 
 module.exports = function(extractedModel) {

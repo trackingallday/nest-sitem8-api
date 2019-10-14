@@ -1,4 +1,4 @@
-const { capitalise } = require('../utils/strUtils');
+const { capitalise } = require('../src/utils/strUtils');
 
 function generateAttribute(attr) {
   const { name, sqltype, text, jsType, sqlizeType } = attr;
