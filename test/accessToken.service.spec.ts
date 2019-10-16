@@ -3,7 +3,11 @@ import { AccessTokenService } from '../src/accessToken/accessToken.service';
 import { AccessTokenModule } from '../src/accessToken/accessToken.module';
 import { WorkerModule } from '../src/worker/worker.module';
 import { DatabaseModule } from '../src/db/database.module';
+import { TokenAuthMiddleware } from '../src/common/tokenauth.middleware';
 
+/*
+  ALSO TESTS THE TOKEN AUTH GATEWAY
+*/
 
 let mockCreatePassword = jest.fn();
 mockCreatePassword.mockReturnValue("password");
@@ -43,6 +47,14 @@ describe('tests the Access Token', () => {
     it('gets the access token', async () => {
       const actoken = await accService.getAccessToken("password");
       expect(actoken.id).toBe(1);
+    });
+
+    it('sends a request to get the user from accessToken', async () => {
+      const tMware:TokenAuthMiddleware = new TokenAuthMiddleware(accService);
+      let req:any = { path: 'ts/password' };
+      const next = () => {};
+      await tMware.use(req, null, next);
+      expect(req.dbUser.id).toBe(3);
     });
 
   });
