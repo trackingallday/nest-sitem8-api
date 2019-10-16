@@ -163,4 +163,16 @@ export class TimesheetEntryService {
   }
 
   //if the total time does not include
+  insertDerivedLunchBreakIntoEntries(entries: TimesheetEntry[], timeSetttings:any, minimumWorkingTimeToRemoveLunchBreak: number) {
+    const { defaultLunchStart, defaultLunchEnd } = timeSetttings;
+    const expectedLunchBreakTime = '';
+    //const totalDayMinutes = moment(entries[0].startDateTime).diff(entries[entries.length - 1].finishDateTime, 'minutes');
+    /*const totalTimeMinutes = entries.map(
+      e => moment(e.startDateTime).diff(moment(e.finishDateTime, 'minutes'))).reduce((
+        a, b) => a + b);*/
+
+    //if(totalTimeMinutes < )
+
+  }
+
 }
