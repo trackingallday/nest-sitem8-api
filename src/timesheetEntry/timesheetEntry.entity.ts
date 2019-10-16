@@ -6,9 +6,6 @@ import { Site } from '../site/site.entity';
 @Table({ tableName: 'timesheetentry', modelName: 'timesheetentry', underscored: true })
 export class TimesheetEntry extends Model<TimesheetEntry> {
 
-  @Column(DataType.INTEGER)
-  timesheetEntryId: number;
-
   @Column(DataType.DATE)
   startDateTime: Date;
 
@@ -24,11 +21,8 @@ export class TimesheetEntry extends Model<TimesheetEntry> {
   @Column(DataType.STRING)
   description: string;
 
-  @Column(DataType.INTEGER)
-  siteAssignmentId: number;
-
-  @Column(DataType.INTEGER)
-  workerAssignmentStatus: number;
+  @Column(DataType.BOOLEAN)
+  shouldCheck: boolean;
 
   @ForeignKey(() => Timesheet)
   @Column(DataType.INTEGER)
