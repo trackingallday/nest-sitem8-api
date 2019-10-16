@@ -1,4 +1,3 @@
-
 import { Injectable, Inject } from '@nestjs/common';
 import { TimesheetEntry } from './timesheetEntry.entity';
 import { LocationEvent } from '../locationEvent/locationEvent.entity';
@@ -162,7 +161,7 @@ export class TimesheetEntryService {
     return entries;
   }
 
-  //if the total time does not include
+  //TODO - WIP if the total time does not include
   insertDerivedLunchBreakIntoEntries(entries: TimesheetEntry[], timeSetttings:any, minimumWorkingTimeToRemoveLunchBreak: number) {
     const { defaultLunchStart, defaultLunchEnd } = timeSetttings;
     const expectedLunchBreakTime = '';
