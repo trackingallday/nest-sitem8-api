@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { AccessTokenService } from '../accessToken/accessToken.service';
 
 
-export class AuthenticationMiddleware implements NestMiddleware {
+export class TokenAuthMiddleware implements NestMiddleware {
 
   constructor(private readonly accessTokenService: AccessTokenService) {}
 
