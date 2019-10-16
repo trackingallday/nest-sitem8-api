@@ -10,7 +10,6 @@ function mtzFromDateTimeTZ(dateutc, timeStr, tzStr) {
   return mDate;
 }
 
-
 module.exports = {
-  mtzFromDateTimeTZ: mtzFromDateTimeTZ,
+  mtzFromDateTimeTZ,
 }
