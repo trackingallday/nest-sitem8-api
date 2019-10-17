@@ -3,10 +3,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { SiteAssignment } from './siteAssignment.entity';
 import { SiteAssignmentInterface } from './siteAssignment.interface';
 import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
-import { Company } from '../company/company.entity';
 import { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
-import WorkerAssignmentDto from 'src/workerAssignment/workerAssignment.dto';
-import { WorkerAssignmentStatus } from '../common/enums';
 
 
 @Injectable()
@@ -15,16 +12,7 @@ export class SiteAssignmentService {
   @Inject('SITEASSIGNMENT_REPOSITORY') private readonly SITEASSIGNMENT_REPOSITORY: typeof SiteAssignment;
   @Inject('DAYOFWEEKTIMESETTING_REPOSITORY') private readonly DAYOFWEEKTIMESETTING_REPOSITORY: typeof DayOfWeekTimeSetting;
   @Inject('WORKERASSIGNMENT_REPOSITORY') private readonly WORKERASSIGNMENT_REPOSITORY: typeof WorkerAssignment;
-  //@Inject('COMPANY_REPOSITORY') private readonly COMPANY_REPOSITORY: typeof Company;
 
-
-  async attachRelated(siteAssignment: SiteAssignment): Promise<any> {
-    const params = { where: { siteAssignmentId: siteAssignment.id }};
-    const dayOfWeekTimeSettings = await this.DAYOFWEEKTIMESETTING_REPOSITORY.findAll<DayOfWeekTimeSetting>(params).toJSON();
-    const workerAssignments = await this.WORKERASSIGNMENT_REPOSITORY.findAll<WorkerAssignment>(params).toJSON();
-    let jsonVal = siteAssignment.toJSON();
-    return { ...jsonVal, dayOfWeekTimeSettings, workerAssignments };
-  }
 
   async findAll(): Promise<SiteAssignment[]> {
     return await this.SITEASSIGNMENT_REPOSITORY.findAll<SiteAssignment>();

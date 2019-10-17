@@ -13,7 +13,9 @@ import { mtzFromDateTimeTZ } from '../utils/dateUtils';
 import { eventTypeEnum } from './constants';
 
 const { ENTER_SITE, EXIT_SITE, ON_SITE, OFF_SITE, PRIVACY_BLOCKED } = eventTypeEnum;
-//TODO make this company specific m
+
+
+//TODO make all of these company specific settings
 const maxSiteDistance = 75;
 //max speed to care about 72KPH (anything higher is proabably inaccurate)
 const maxAccuracySpeedMS = 20;
@@ -25,6 +27,8 @@ const maxEnterSpeedMS = 9;
 const maxOnSpeedMS = 3;
 //meters outside accuracy bounds
 const absoluteMaXOnSiteDistanceM = 250;
+const tzStr= 'Pacific/Auckland';
+
 
 
 
@@ -83,7 +87,6 @@ export class LocationEventService {
   async createFromLocationTimestamp(loc: LocationTimestamp, previousLocs: LocationTimestamp[],
       timeSettings: any, company: Company): Promise<LocationEvent> {
 
-    const tzStr= 'Pacific/Rarotonga';
     let locEvt:any = {};
 
     locEvt.locationTimestampId = loc.id;
@@ -155,8 +158,8 @@ function isPrivacyBlocked(loc: LocationTimestamp, timeSettings:any, tzStr: strin
   const { workingDayEarliestStart, workingDayLatestFinish } = timeSettings;
   const datetimeutc = loc.locationDateTime;
   const mLoctime = momenttz.utc(datetimeutc).tz(tzStr);
-  const mEarliest = mtzFromDateTimeTZ(datetimeutc, workingDayEarliestStart, tzStr);
-  const mLatest = mtzFromDateTimeTZ(datetimeutc, workingDayLatestFinish, tzStr);
+  const mEarliest = momenttz(mtzFromDateTimeTZ(datetimeutc, workingDayEarliestStart, tzStr).format('YYYY-MM-DD HH:MM'));
+  const mLatest = momenttz(mtzFromDateTimeTZ(datetimeutc, workingDayLatestFinish, tzStr).format('YYYY-MM-DD HH:MM'));
   return mLoctime.isBefore(mEarliest) || mLoctime.isAfter(mLatest);
 }
 
