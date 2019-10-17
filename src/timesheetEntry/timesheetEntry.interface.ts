@@ -11,4 +11,3 @@ export class TimesheetEntryInterface {
   readonly siteAssignmentId: number;
   readonly workerAssignmentStatus: number;
 }
-  

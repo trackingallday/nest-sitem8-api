@@ -5,12 +5,15 @@ import { NotificationInterface } from './notification.interface';
 import { NotificationConstants, NotificationStatus } from './constants';
 import { LocationTimestamp } from '../locationTimestamp/locationTimestamp.entity';
 import { Worker } from '../worker/worker.entity';
+import { sendSMS } from '../common/send.sms';
+import { Email } from '../common/send.email';
 import * as moment from 'moment';
 
 @Injectable()
 export class NotificationService {
 
   @Inject('NOTIFICATION_REPOSITORY') private readonly NOTIFICATION_REPOSITORY: typeof Notification;
+  private readonly emailGateway = new Email();
 
   async findAll(): Promise<Notification[]> {
     return await this.NOTIFICATION_REPOSITORY.findAll<Notification>();
@@ -88,7 +91,7 @@ export class NotificationService {
   async addNotification(category: string, description: string, worker: Worker)
     : Promise<Notification> {
     // Create the notification.
-    const notification = {
+    const notification: any = {
       workerId: worker.id,
       category,
       description: description.length <= 160 ? description : description.substring(0, 160),
@@ -98,6 +101,38 @@ export class NotificationService {
       mobileNumber: worker.mobile && worker.mobile,
     };
 
+    // Send sms
+    if (notification.smsStatus === NotificationStatus.Pending) {
+      const response: any = await sendSMS(worker.mobile, notification.description);
+      if (response.code === 200) {
+        notification.smsSentDateTime =  moment().utc().toDate();
+        notification.smsStatus = NotificationStatus.Sent;
+      } else if (response.code !== 500) {
+        notification.smsStatus = NotificationStatus.Error;
+      }
+    }
+
+    // Send email
+    if (notification.emailStatus === NotificationStatus.Pending) {
+      try {
+        const companyName = notification.worker.company.name;
+        const response: any = await this.emailGateway.sendMail(
+          notification.description,
+          notification.emailAddress,
+          notification.category,
+          companyName,
+          );
+        if (response.code === 200) {
+          notification.emailSentDateTime =  moment().utc().toDate();
+          notification.emailStatus = NotificationStatus.Sent;
+        } else if (response.code !== 500) {
+          notification.emailStatus = NotificationStatus.Error;
+        }
+      } catch {
+        // todo:
+        // logger.Error($'Failed to determine the company name for notification {notification.NotificationId}');
+      }
+    }
     return await this.NOTIFICATION_REPOSITORY.create(notification);
   }
 

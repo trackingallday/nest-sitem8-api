@@ -12,7 +12,19 @@ export default {
     client_id: 'Wklj110vB6fxBQ4FnUDHBtQtWPEXkoHY',
     client_secret: 'V8h199upY_tRxUu_gaRO6op2c54G1rgw9K11mVGZy1i3_H8yTsD_JBkamk8SrlLB',
   },
+  twilio_sms: {
+    accountSid: 'AC93f4fe567250a98ffdbb494b0117f4c8',
+    authToken: 'ace68afe2978da39b38c5a96f366dcf5',
+    twilioSenderNumber: '+644354564',
+    balance_url: 'https://api.twilio.com/2010-04-01/Accounts/AC93f4fe567250a98ffdbb494b0117f4c8/Balance.json',
+    basicAuth: {withCredentials: true, headers: { Authorization:  'Basic '
+    + Buffer.from('AC93f4fe567250a98ffdbb494b0117f4c8:ace68afe2978da39b38c5a96f366dcf5').toString('base64')} },
+  },
+  gmail: {
+    username: 'xxx',
+    password: 'xxx',
+  },
   repositories: {
     items: 'ITEMS_REPOSITORY',
-  }
-}
+  },
+};
