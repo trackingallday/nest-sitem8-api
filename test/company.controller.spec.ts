@@ -6,7 +6,7 @@ import { CreateCompanyDto } from '../src/company/createcompany.dto';
 import { CompanyDto } from '../src/company/company.dto';
 import { AccessTokenService } from '../src/accessToken/accessToken.service';
 import { AccessTokenModule } from '../src/accessToken/accessToken.module';
-import { mockPost, mockGet } from './httpUtils';
+import { mockPost, mockGet } from './utils/httpUtils';
 import { CompanyInterface } from '../src/company/company.interface';
 
 

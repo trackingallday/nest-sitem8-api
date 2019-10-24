@@ -7,8 +7,8 @@ import { Worker } from '../src/worker/worker.entity';
 import { Device } from '../src/device/device.entity';
 import { Site } from '../src/site/site.entity';
 import { LocationTimestamp } from '../src/locationTimestamp/locationTimestamp.entity';
-import { genLocationTimestamp } from './dataGenerators';
-import testconstants from './test-constants';
+import { genLocationTimestamp } from './utils/dataGenerators';
+import testconstants from './testdata/test-constants';
 
 
 async function setupAsync() {
@@ -41,7 +41,5 @@ async function setupAsync() {
 }
 
 export default async function setup() {
-  let a = 'a';
-  let b = 'b';
   await setupAsync();
 }

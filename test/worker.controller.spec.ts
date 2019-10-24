@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { WorkerController } from '../src/worker/worker.controller';
 import { WorkerModule } from '../src/worker/worker.module';
 import { DatabaseModule } from '../src/db/database.module';
-import { mockPost, mockGet } from './httpUtils';
+import { mockPost, mockGet } from './utils/httpUtils';
 
 
 function genWorker(isSupervisor, isWorker, isAdministrator, email, supervisor, deviceId = null) {

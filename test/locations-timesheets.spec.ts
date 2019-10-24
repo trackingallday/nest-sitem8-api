@@ -5,10 +5,10 @@ import { LocationTimestampController } from '../src/locationTimestamp/locationTi
 import { TimesheetModule } from '../src/timesheet/timesheet.module';
 import { TimesheetController } from '../src/timesheet/timesheet.controller';
 import { TimesheetEntry } from '../src/timesheetEntry/timesheetEntry.entity';
-import { mockPost, mockGet } from './httpUtils';
-import * as testlocs from './orbica-morning.json';
-import { genLocationTimestamp } from './dataGenerators';
-import testConstants from './test-constants';
+import { mockPost, mockGet } from './utils/httpUtils';
+import * as testlocs from './testdata/orbica-morning.json';
+import { genLocationTimestamp } from './utils/dataGenerators';
+import testConstants from './testdata/test-constants';
 import * as momenttz from 'moment-timezone';
 
 
@@ -90,7 +90,7 @@ describe('tests the company controller', () => {
     const tseres = await timesheetController.savemanyentries(
       mockPost(`/savemanyentries/${tsres.id}`, tseJson, { companyId: 1, id: 4 }), tsres.id, tseJson);
     expect(tseres.length).toBe(2);
-    expect(tseres.every())
+    expect(tseres.every((t) => !t.id));
   });
 
   it('gets timesheet entries and checks for ids on them', async () => {
@@ -101,7 +101,7 @@ describe('tests the company controller', () => {
     const params = { startDate, endDate };
     savedEntries = await timesheetController.getTimesheetEntriesByDateRange(
       mockPost(`/timesheetentriesbydaterange/${workerId}`, params, { companyId: 1, id: 4 }), workerId, params);
-
+    expect(savedEntries.length).toBe(2);
     expect(savedEntries.every(a => !!a.id)).toBeTruthy();
   });
 

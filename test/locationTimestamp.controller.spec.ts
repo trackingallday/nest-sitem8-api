@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LocationTimestampController } from '../src/locationTimestamp/locationTimestamp.controller';
 import { LocationTimestampModule } from '../src/locationTimestamp/locationTimestamp.module';
 import { DatabaseModule } from '../src/db/database.module';
-import { mockPost, mockGet } from './httpUtils';
-import testconstants from './test-constants';
-import { genLocationTimestamp } from './dataGenerators';
+import { mockPost, mockGet } from './utils/httpUtils';
+import testconstants from './testdata/test-constants';
+import { genLocationTimestamp } from './utils/dataGenerators';
 import * as moment from 'moment';
 
 const expectedDistance0 = 0;
