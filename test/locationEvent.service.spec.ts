@@ -11,7 +11,6 @@ import { CompanyService } from '../src/company/company.service';
 import { TimesheetEntryModule } from '../src/timesheetEntry/timesheetEntry.module';
 import { TimesheetEntryService } from '../src/timesheetEntry/timesheetEntry.service';
 import * as momenttz from 'moment-timezone';
-import { LocationEvent } from '../src/locationEvent/locationEvent.entity';
 
 
 describe('tests the Location Timstamp Service', () => {
