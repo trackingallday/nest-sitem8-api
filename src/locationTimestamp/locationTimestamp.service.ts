@@ -42,8 +42,8 @@ export class LocationTimestampService {
           {
             locationDateTime: {
               [Op.and]:[
-                { [Op.gte]: startDate },
-                { [Op.lte]: endDate },
+                { [Op.gt]: startDate },
+                { [Op.lt]: endDate },
               ],
             },
           }
