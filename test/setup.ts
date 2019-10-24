@@ -25,8 +25,10 @@ async function setupAsync() {
   await workerRepo.create(testconstants.admin);
   await workerRepo.create(testconstants.supervisor);
   await workerRepo.create(testconstants.worker);
+  await workerRepo.create(testconstants.worker2);
 
   await deviceRepo.create(testconstants.device);
+  await deviceRepo.create(testconstants.device2);
 
   await siteRepo.create(testconstants.site);
 
@@ -37,7 +39,6 @@ async function setupAsync() {
   await locRepo.bulkCreate(locs.map(
     (l, i) => ({ ...l, closestSiteId: 1, closestSiteDistance: i * 30, workerId: 3 })));
 
-  console.log('************************SETUP IS DONE');
 }
 
 export default async function setup() {
