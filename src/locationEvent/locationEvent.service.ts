@@ -9,7 +9,7 @@ import { Worker } from '../worker/worker.entity';
 import { SiteAssignment } from '../siteAssignment/siteAssignment.entity';
 import { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetting.entity';
 import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
-import { mtzFromDateTimeTZ } from '../utils/dateUtils';
+import { mtzFromDateTimeTZ, mtzFromTimeStr } from '../utils/dateUtils';
 import { eventTypeEnum } from './constants';
 
 const { ENTER_SITE, EXIT_SITE, ON_SITE, OFF_SITE, PRIVACY_BLOCKED } = eventTypeEnum;
@@ -36,7 +36,6 @@ const tzStr= 'Pacific/Auckland';
 export class LocationEventService {
 
   @Inject('LOCATIONEVENT_REPOSITORY') private readonly LOCATIONEVENT_REPOSITORY: typeof LocationEvent;
-  @Inject('LOCATIONTIMESTAMP_REPOSITORY') private readonly LOCATIONTIMESTAMP_REPOSITORY: typeof LocationTimestamp;
   @Inject('SITEASSIGNMENT_REPOSITORY') private readonly SITEASSIGNMENT_REPOSITORY: typeof SiteAssignment;
 
   //AddLocationTimestamp
@@ -93,17 +92,25 @@ export class LocationEventService {
 
     if(!previousLocs.length) {
       locEvt.eventType = getEvtTypeFromSingleLoc(loc, timeSettings, tzStr);
-      return this.create(locEvt);
+      const res = await this.create(locEvt);
+      return res;
     }
 
     const evtType:string = await this.getEvtTypeFromLocGroup(loc, previousLocs, timeSettings, company, tzStr);
     locEvt.eventType = evtType;
-    return this.create(locEvt);
+    const res = await this.create(locEvt);
+    return res;
   }
 
   async getEvtTypeFromLocGroup(loc: LocationTimestamp, previousLocs: LocationTimestamp[], timeSettings: any, company: any, tzStr: string):Promise<string> {
+    if(isPrivacyBlocked(loc, timeSettings, tzStr)) {
+      return PRIVACY_BLOCKED;
+    }
+    previousLocs.sort((a, b) => {
+      return momenttz(a.locationDateTime).isBefore(momenttz(b.locationDateTime)) ? -1 : 1;
+    });
     const latestLoc = previousLocs[previousLocs.length - 1];
-    const latestEvent = await this.findOneWhere({ where: { locationTimestampId: latestLoc.id }});
+    const latestEvent = latestLoc.locationEvent;
     const latestEventType = latestEvent ? latestEvent.eventType : PRIVACY_BLOCKED;
 
     const currentTimeUtc = momenttz.utc(loc.locationDateTime);
@@ -124,7 +131,7 @@ export class LocationEventService {
     const isWithinToleranceDuration = toleraceDurationSec < latestTimeSec;
     const isTooFarAway = loc.closestSiteDistance > absoluteMaXOnSiteDistanceM;
 
-    const canExit = !isWithinMaxDistance && canEnterExitSpeed && isWithinSpeedAccuracy && !isWithinToleranceDuration;
+    const canExit = (!isWithinMaxDistance && canEnterExitSpeed && isWithinSpeedAccuracy) || !isWithinToleranceDuration;
     const canEnter = isWithinMaxDistance && canEnterExitSpeed && isWithinSpeedAccuracy;
 
     if ([ENTER_SITE, ON_SITE].includes(latestEventType)){
@@ -154,12 +161,11 @@ function getEvtTypeFromSingleLoc(loc: LocationTimestamp, timeSettings:any, tzStr
   return OFF_SITE;
 }
 
-function isPrivacyBlocked(loc: LocationTimestamp, timeSettings:any, tzStr: string) {
+export function isPrivacyBlocked(loc: LocationTimestamp, timeSettings:any, tzStr: string) {
   const { workingDayEarliestStart, workingDayLatestFinish } = timeSettings;
-  const datetimeutc = loc.locationDateTime;
-  const mLoctime = momenttz.utc(datetimeutc).tz(tzStr);
-  const mEarliest = momenttz(mtzFromDateTimeTZ(datetimeutc, workingDayEarliestStart, tzStr).format('YYYY-MM-DD HH:MM'));
-  const mLatest = momenttz(mtzFromDateTimeTZ(datetimeutc, workingDayLatestFinish, tzStr).format('YYYY-MM-DD HH:MM'));
-  return mLoctime.isBefore(mEarliest) || mLoctime.isAfter(mLatest);
+  const mLoctimeStr = momenttz(loc.locationDateTime).tz(tzStr).format('HH:mm');
+  const isEarly = mtzFromTimeStr(mLoctimeStr).isBefore(mtzFromTimeStr(workingDayEarliestStart));
+  const isLate =  mtzFromTimeStr(mLoctimeStr).isAfter(mtzFromTimeStr(workingDayLatestFinish));
+  return isEarly || isLate;
 }
 
