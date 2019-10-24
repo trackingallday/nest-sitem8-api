@@ -75,8 +75,8 @@ export class Company extends Model<Company> {
   @HasMany(() => Worker)
   workers: Worker[];
 
-  @HasMany(() => Timesheet)
-  timesheets: Timesheet[];
+  /*@HasMany(() => Timesheet)
+  timesheets: Timesheet[];*/
 
   eatsChickens() {
     return 'I ATE SOME CHICKENS'
