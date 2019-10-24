@@ -1,12 +1,14 @@
 
 import { Injectable, Inject } from '@nestjs/common';
+import { Op } from 'sequelize';
 import { TimesheetEntry } from './timesheetEntry.entity';
+import { Timesheet } from '../timesheet/timesheet.entity';
 import { LocationEvent } from '../locationEvent/locationEvent.entity';
-import { TimesheetEntryInterface } from './timesheetEntry.interface';
+import { TimesheetEntryDto } from './timesheetEntry.dto';
 import { isNil, isEmpty, intersectionBy, differenceBy } from 'lodash';
 import { eventTypeEnum } from '../locationEvent/constants';
 import { mtzFromDateTimeTZ } from '../utils/dateUtils';
-import * as moment from 'moment';
+import * as momenttz from 'moment-timezone';
 
 
 @Injectable()
@@ -18,40 +20,35 @@ export class TimesheetEntryService {
     return await this.TIMESHEETENTRY_REPOSITORY.findAll<TimesheetEntry>();
   }
 
-  async create(props: TimesheetEntryInterface): Promise<TimesheetEntry> {
+  async create(props: TimesheetEntryDto): Promise<TimesheetEntry> {
     return await this.TIMESHEETENTRY_REPOSITORY.create<TimesheetEntry>(props);
   }
 
-  async findAllWhere(props): Promise<TimesheetEntry[]> {
+  async findAllWhere(props:any): Promise<TimesheetEntry[]> {
     return await this.TIMESHEETENTRY_REPOSITORY.findAll<TimesheetEntry>(props);
   }
 
-  async findOneWhere(props): Promise<TimesheetEntry> {
+  async findOneWhere(props:any): Promise<TimesheetEntry> {
     return await this.TIMESHEETENTRY_REPOSITORY.findOne<TimesheetEntry>(props);
   }
 
-  async findById(id): Promise<TimesheetEntry> {
-    return await this.TIMESHEETENTRY_REPOSITORY.findByPk<TimesheetEntry>(id);
+  async findById(id:number): Promise<TimesheetEntry> {
+    return await this.TIMESHEETENTRY_REPOSITORY.findByPk<TimesheetEntry>(id,  {
+      include: [
+        {
+          model: Timesheet,
+        },
+      ]});
   }
 
-  async deleteTimesheetEntries(startInclusive: Date, finishExclusive: Date, timesheetId: number[]): Promise<void> {
-    await this.TIMESHEETENTRY_REPOSITORY.destroy({
-      where:
-      {
-        id: timesheetId,
-        startDateTime: {
-          $lte: startInclusive.getDate(),
-        },
-        finishDateTime: {
-          $gt: finishExclusive.getDate(),
-        },
-      },
-    });
+  async createMany(props: TimesheetEntryDto[]): Promise<TimesheetEntry[]> {
+    return await this.TIMESHEETENTRY_REPOSITORY.bulkCreate(props);
   }
 
-  // delete timesheet entries by ids in imput array
-  async deleteByTimesheetEntryIds(timesheetEntryId: number[]): Promise<void> {
-    await this.TIMESHEETENTRY_REPOSITORY.destroy({ where: { timesheetEntryId } });
+  async update(props: TimesheetEntryDto):Promise<TimesheetEntry> {
+    const ts = await this.findById(props.id);
+    await ts.update(props);
+    return ts;
   }
 
   // bulk add timesheet entries
@@ -72,46 +69,36 @@ export class TimesheetEntryService {
     return await this.TIMESHEETENTRY_REPOSITORY.findAll<TimesheetEntry>({ where: { timesheetId } });
   }
 
-  async overwriteTimesheetEntries(newEntries: TimesheetEntry[], timesheetId: number, loggedInWorkerName: string, loggedInWorkerId: number) {
-    const oldEntries = await this.getTimesheetEntriesByTimesheetId(timesheetId);
-
-    if ((await this.TIMESHEETENTRY_REPOSITORY.count({ where: { timesheetId: { $ne: timesheetId } } })) > 0) {
-      // todo:
-      // throw new SiteM8Exception("Bad timesheet ID");
-    }
-
-    // Timesheet entries to add.
-    const entriesToAdd = newEntries.filter(x => x.timesheetId === 0);
-    if (!isNil(entriesToAdd) && !isEmpty(entriesToAdd)) { await this.addByTimesheetId(entriesToAdd); }
-
-    // Timesheet entries to update.
-    const entriesToUpdate = intersectionBy(newEntries, oldEntries, 'timesheetEntryId');
-    if (!isNil(entriesToUpdate) && !isEmpty(entriesToUpdate)) {
-      const timesheetEntriesUpdate: TimesheetEntry[] = [];
-      entriesToUpdate.forEach(u => {
-        const o = oldEntries.find(f => f.timesheetEntryId === u.timesheetEntryId);
-        if (o.startDateTime !== u.startDateTime || o.finishDateTime !== u.finishDateTime
-          || u.siteId !== u.siteId || o.travel !== u.travel) {
-            u.description = `Update by ${loggedInWorkerName}`;
-            u.modifiedWorkerId = loggedInWorkerId;
-            timesheetEntriesUpdate.push(u);
-        }
-      });
-      await this.updateByTimesheetEntryIds(timesheetId, timesheetEntriesUpdate);
-    }
-
-    // Timesheet entries to delete.
-    const entriesToDelete = differenceBy(oldEntries, newEntries, 'timesheetEntryId');
-    if (!isNil(entriesToDelete) && !isEmpty(entriesToDelete)) {
-      await this.deleteByTimesheetEntryIds(entriesToDelete.map(x => x.timesheetEntryId));
-    }
+  async getEntriesBetween(startDate: Date, endDate: Date, workerId: number): Promise<TimesheetEntry[]> {
+    return await this.findAllWhere({
+      where: {
+        [Op.and]:[
+          { finishDateTime: {
+            [Op.lte]: endDate },
+          },
+          { startDateTime: {
+            [Op.gte]: startDate },
+          },
+        ],
+      },
+      include: [
+        { model: Timesheet, where: workerId }
+      ],
+      order: [
+        ['finish_date_time', 'DESC'],
+      ],
+    });
   }
 
-  //location events are sorted by time and have their locationTimestamp included
+  //location events have their locationTimestamp included
   //timesettings can be a company or a dayOfWeekTimeSetting object
   generateOnSiteTimesheetEntries(locationEvents: LocationEvent[], timeSettings:any, tzStr: string) : TimesheetEntry[] {
     const { ENTER_SITE, EXIT_SITE } = eventTypeEnum;
     const { workingDayLatestFinish } = timeSettings;
+    locationEvents.sort(
+      (a, b) => momenttz(a.locationTimestamp.locationDateTime).isBefore(
+        momenttz(b.locationTimestamp.locationDateTime)) ? -1 : 1);
+
     const entries:TimesheetEntry[] = [];
     locationEvents.forEach(le => {
       switch(le.eventType) {
@@ -121,7 +108,9 @@ export class TimesheetEntryService {
           tse.siteId = le.locationTimestamp.closestSiteId;
           entries.push(tse);
         case EXIT_SITE:
-          entries[entries.length - 1].finishDateTime = le.locationTimestamp.locationDateTime;
+          if(entries.length) {
+            entries[entries.length - 1].finishDateTime = le.locationTimestamp.locationDateTime;
+          }
       }
     });
 
