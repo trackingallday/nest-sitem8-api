@@ -2,8 +2,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Op } from 'sequelize';
 import { Worker } from './worker.entity';
+import { Company } from '../company/company.entity';
 import { WorkerInterface } from './worker.interface';
-import constants from '../constants';
+
 
 @Injectable()
 export class WorkerService {
@@ -30,7 +31,7 @@ export class WorkerService {
 
   // GetWorker GetWorkerAnyCompany
   async findById(id): Promise<Worker> {
-    return await this.WORKER_REPOSITORY.findByPk<Worker>(id);
+    return await this.WORKER_REPOSITORY.findByPk<Worker>(id, { include: [Company] });
   }
 
   async updateOne(id: number, props: any): Promise<Worker> {
@@ -76,6 +77,21 @@ export class WorkerService {
 
   async getWorkerByAuthId(authId: string): Promise<Worker> {
     return await this.findOneWhere({ where: { authId }});
+  }
+
+  async findManyByIds(ids: number[]): Promise<Worker[]> {
+    return await this.findAllWhere({
+      where: {
+        id: {
+          [Op.in]: ids,
+        },
+      },
+    });
+  }
+
+  async validateWorkerCompanyIds(ids: number[], companyId: number): Promise<Boolean> {
+    const workers = await this.findManyByIds(ids);
+    return workers.every(w => w.companyId === companyId);
   }
 
 }
