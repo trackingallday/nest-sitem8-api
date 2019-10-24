@@ -36,6 +36,26 @@ export class TimesheetService {
   // GetTimesheet
   async findById(timesheetId: number, companyId: number): Promise<Timesheet> {
     return await this.TIMESHEET_REPOSITORY.findOne<Timesheet>({ where: { companyId, timesheetId } });
+  async findById(timesheetId: number): Promise<Timesheet> {
+    return await this.TIMESHEET_REPOSITORY.findByPk<Timesheet>(timesheetId,  {
+      include: [
+        {
+          model: Worker,
+        },
+      ]});
+  }
+
+  async findByIdWithWorkerAndEntries(id:number): Promise<Timesheet> {
+    return this.TIMESHEET_REPOSITORY.findByPk(id, {
+      include: [
+        {
+          model: Worker,
+        },
+        {
+          model: TimesheetEntry,
+        }
+      ]
+    })
   }
 
   async createTimesheetsIfMissing(utcNow: Date, company: Company): Promise<void> {
