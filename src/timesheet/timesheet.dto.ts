@@ -1,9 +1,7 @@
 
-import { IsString, IsInt, IsOptional, IsNumber, IsDate, IsBoolean } from 'class-validator';
+import { IsNumber, IsDate } from 'class-validator';
 
-export default class TimesheetDto {
-
-  @IsNumber() readonly timesheetId: number;
+export class TimesheetDto {
 
   @IsDate() readonly startDateTime: Date;
 
@@ -12,7 +10,5 @@ export default class TimesheetDto {
   @IsNumber() readonly status: number;
 
   @IsNumber() readonly workerId: number;
-
-  @IsNumber() readonly companyId: number;
 
 }
