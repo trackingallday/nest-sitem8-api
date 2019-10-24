@@ -28,7 +28,7 @@ export class Timesheet extends Model<Timesheet> {
   worker: Worker;
 
   @HasMany(() => TimesheetEntry)
-  timesheetEntry: TimesheetEntry[];
+  timesheetEntrys: TimesheetEntry[];
 
   @ForeignKey(() => Company)
   @Column(DataType.INTEGER)
@@ -38,5 +38,5 @@ export class Timesheet extends Model<Timesheet> {
   company: Company;
 
   @HasMany(() => TimesheetNote)
-  timesheetNote: TimesheetNote[];
+  timesheetNotes: TimesheetNote[];
 }
