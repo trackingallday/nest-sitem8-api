@@ -162,6 +162,12 @@ export class TimesheetEntryService {
     return entries;
   }
 
+  generateTimesheetEntries(locationEvents: LocationEvent[], timeSettings:any, tzStr: string) {
+    const onsites = this.generateOnSiteTimesheetEntries(locationEvents, timeSettings, tzStr);
+    const offsites = this.generateOffSiteTimesheetEntries(onsites);
+    return [...onsites, ...offsites];
+  }
+
   //if the total time does not include
   insertDerivedLunchBreakIntoEntries(entries: TimesheetEntry[], timeSetttings:any, minimumWorkingTimeToRemoveLunchBreak: number) {
     const { defaultLunchStart, defaultLunchEnd } = timeSetttings;
