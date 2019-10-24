@@ -22,16 +22,15 @@ async function setupAsync() {
 
   await companyRepo.create(testconstants.company);
 
-  await workerRepo.create(testconstants.admin);
-  await workerRepo.create(testconstants.supervisor);
-  await workerRepo.create(testconstants.worker);
-  await workerRepo.create(testconstants.worker2);
+  await workerRepo.create(testconstants.admin);// id 1
+  await workerRepo.create(testconstants.supervisor);// id 2
+  await workerRepo.create(testconstants.worker);// id 3
+  await workerRepo.create(testconstants.worker2);//id 4
 
-  await deviceRepo.create(testconstants.device);
-  await deviceRepo.create(testconstants.device2);
+  await deviceRepo.create(testconstants.device);// id 1
+  await deviceRepo.create(testconstants.device2);// id 2
 
-  await siteRepo.create(testconstants.site);
-
+  await siteRepo.create(testconstants.site);// 1
 
   const locs = testconstants.nearOrbicaPoints.map(
     (c, i) => genLocationTimestamp(testconstants.device.deviceId, c[1], c[0], i));
