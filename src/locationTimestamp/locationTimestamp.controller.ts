@@ -9,7 +9,8 @@ import { WorkerService } from '../worker/worker.service';
 import { LocationTimestamp } from './locationTimestamp.entity';
 import LocationTimestampDto from './locationTimestamp.dto';
 import { ValidationPipe } from '../common/validation.pipe';
-
+import { Company } from '../company/company.entity';
+import * as momenttz from 'moment-timezone';
 
 @Controller('locationTimestamp')
 export class LocationTimestampController {
@@ -34,7 +35,15 @@ export class LocationTimestampController {
   @Post()
   @UsePipes(new ValidationPipe())
   async create(@Req() req, @Body() loc: LocationTimestampDto) {
-    const worker = await this.workerService.findOneWhere({ where: { deviceId: loc.deviceId }});
+
+    const worker = await this.workerService.findOneWhere({
+      where: { deviceId: loc.deviceId },
+      include: [Company],
+    });
+
+    const tenMinutesAgo = momenttz(loc.locationDateTime).subtract(10, 'minutes').toDate();
+
+    const previousLocs = await this.locationTimestampService.findByDeviceIdDateRange(tenMinutesAgo, loc.locationDateTime, loc.deviceId);
 
     const blockedIds = await this.siteAssignmentService.getBlockedSiteIdsByWorkerId(
       req.dbUser.id);
@@ -42,18 +51,16 @@ export class LocationTimestampController {
     const closestSiteId = await this.siteService.getClosestAssignedSiteId(
       loc.latitude, loc.longitude, blockedIds, req.dbUser.companyId);
 
-
     const closestSiteDistance = await this.siteService.getDistanceToSite(
       closestSiteId, loc.latitude, loc.longitude);
 
-    const device = await this.deviceService.findOneWhere({ where: { deviceId: loc.deviceId } });
-    const fullLoc = { ...loc, closestSiteId, closestSiteDistance, workerId: worker.id, deviceId: device.id };
+    const fullLoc = { ...loc, closestSiteId, closestSiteDistance, workerId: worker.id };
 
-    const res = await this.locationTimestampService.create(fullLoc);
-
-    const locationEvent = await this.locationEventService.create(fullLoc);
-
-    return res.toJSON();
+    const locTimestamp = await this.locationTimestampService.create(fullLoc);
+    const locEvent = await this.locationEventService.createFromLocationTimestamp(locTimestamp, previousLocs,
+      worker.company, worker.company);
+    locTimestamp.locationEvent = locEvent;
+    return locTimestamp;
   }
 
   @Get('/latestlocationtimestamps')
