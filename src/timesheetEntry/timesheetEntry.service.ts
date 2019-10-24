@@ -1,4 +1,3 @@
-
 import { Injectable, Inject } from '@nestjs/common';
 import { Op } from 'sequelize';
 import { TimesheetEntry } from './timesheetEntry.entity';
@@ -157,7 +156,7 @@ export class TimesheetEntryService {
     return [...onsites, ...offsites];
   }
 
-  //if the total time does not include
+  //TODO - WIP if the total time does not include lunch break do something
   insertDerivedLunchBreakIntoEntries(entries: TimesheetEntry[], timeSetttings:any, minimumWorkingTimeToRemoveLunchBreak: number) {
     const { defaultLunchStart, defaultLunchEnd } = timeSetttings;
     const expectedLunchBreakTime = '';
