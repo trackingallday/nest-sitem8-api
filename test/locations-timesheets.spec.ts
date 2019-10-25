@@ -109,12 +109,11 @@ describe('tests the company controller', () => {
 
     const savedEntry:any = { ...savedEntries[1].toJSON() };
     savedEntry.finishDateTime = momenttz(savedEntry.finishDateTime).add(1, 'hours').toDate();
-    const updateEntry =  await timesheetController.update(
+    const updateEntry = await timesheetController.update(
       mockPost(`/updateoneentry`, savedEntry, { companyId: 1, id: 4 }), savedEntry);
 
-    expect(updateEntry.startDateTime).toBe(savedEntry.startDateTime);
-    expect(updateEntry.finishDateTime).toBe(
-      momenttz(savedEntry.finishDateTime).add(1, 'hours').toDate());
+    expect(updateEntry.startDateTime.toISOString()).toBe(savedEntry.startDateTime.toISOString());
+    expect(updateEntry.finishDateTime.toISOString()).toBe(savedEntry.finishDateTime.toISOString());
 
   });
 
