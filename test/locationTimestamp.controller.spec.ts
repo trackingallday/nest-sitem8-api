@@ -6,6 +6,7 @@ import { mockPost, mockGet } from './utils/httpUtils';
 import testconstants from './testdata/test-constants';
 import { genLocationTimestamp } from './utils/dataGenerators';
 import * as moment from 'moment';
+import testConstants from './testdata/test-constants';
 
 const expectedDistance0 = 0;
 const expectedDistance1 = 18;
@@ -52,8 +53,8 @@ describe('tests the LocationTimestampController', () => {
       const locs = await locController.getLatestLocations(
         mockGet('/latestlocationtimestamps', { companyId: 1, id: 1 }));
 
-      expect(locs.length).toBe(1);
-      expect(locs[0].closestSiteDistance).toBe(0);
+      expect(locs.find(l => l.deviceId === testConstants.device.deviceId)).toBeDefined();
+      expect(locs.filter(l => l.deviceId === testConstants.device.deviceId).length).toBe(1);
     });
 
   });
