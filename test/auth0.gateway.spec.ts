@@ -5,11 +5,6 @@ import axios from 'axios';
 const email = Math.random() + 'rimu.aw23.lol@chickens.org';
 const email2 = Math.random() + 'dave.aw3s.lol@chickens.org';
 
-const mockAxiosPost = jest.fn();
-const mockAxiosDelete = jest.fn();
-const mockAxiosPatch = jest.fn();
-
-
 jest.mock('axios');
 axios.patch.mockResolvedValue({ data: { ticket: 'a', access_token: 'c' }});
 axios.post.mockResolvedValue({ data: { ticket: 'a', access_token: 'c' }});
