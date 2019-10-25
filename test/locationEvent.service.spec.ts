@@ -46,9 +46,11 @@ describe('tests the Location Timstamp Service', () => {
     company.set(companyVals);
   });
 
+
+  // big nasty long test - because I don't want to put in promises to wait on the next it each time
   it('generates location events from location timestamps', async () => {
 
-    locs = await doImport('w146-locs.csv');
+    locs = await doImport('testdata/w146-locs.csv');
     locEvtService['findOneWhere'] = fakeFindOne;
     locEvtService['create'] = fakeSave;
 
@@ -60,31 +62,27 @@ describe('tests the Location Timstamp Service', () => {
           const dt =  momenttz(l.locationDateTime);
           const start = momenttz(locs[i].locationDateTime).subtract(elevenmin);
           return dt.isAfter(start);
+        }).map(lt => {
+          const le = locationEvents.find(le => le.locationTimestampId === lt.id);
+          return { ...lt, locationEvent: le };
         });
 
       const evt = await locEvtService.createFromLocationTimestamp(
         locs[i], last10Min, company, company);
-        evt.locationTimestamp = locs[i];
-        locationEvents.push(evt);
+      evt.locationTimestamp = locs[i];
+      locationEvents.push(evt);
     }
 
     expect(locationEvents.filter(t => t.eventType === 'on_site').length).toBe(572);
     expect(locationEvents.filter(t => t.eventType === 'enter_site').length).toBe(2);
     expect(locationEvents.filter(t => t.eventType === 'exit_site').length).toBe(2);
-    expect(locationEvents.filter(t => t.eventType === 'privacy_blocked').length).toBe(13);
-    expect(locationEvents.filter(t => t.eventType === 'off_site').length).toBe(287);
-
+    expect(locationEvents.filter(t => t.eventType === 'privacy_blocked').length).toBe(232);
+    expect(locationEvents.filter(t => t.eventType === 'off_site').length).toBe(68);
     expect(locationEvents.length).toBe(locs.length);
     locationEventsContainer = [...locationEvents];
   });
 
-  it('generates timesheetEntries From the locationEvents', async () => {
-
-    await new Promise((res) => {
-      if(locationEventsContainer && locationEventsContainer.length) {
-        res();
-      }
-    });
+  it('uses the location events to create timesheet entries', async () => {
 
     const onsiteEntries = timesheetEntryService.generateOnSiteTimesheetEntries(
       locationEventsContainer, company, 'Pacific/Auckland');
@@ -96,9 +94,6 @@ describe('tests the Location Timstamp Service', () => {
     expect(momenttz(onsiteEntries[1].startDateTime).format()).toBe('2018-09-03T01:17:45+00:00');
     expect(momenttz(onsiteEntries[1].finishDateTime).format()).toBe('2018-09-03T05:36:02+00:00');
 
-  });
-
-  it('tests the privacy blocking method', () => {
     const isBlocked1 = isPrivacyBlocked(locs[0], company, 'Pacific/Auckland');
     expect(isBlocked1).toBeTruthy();
     const isBlocked2 = isPrivacyBlocked(locs[200], company, 'Pacific/Auckland');
