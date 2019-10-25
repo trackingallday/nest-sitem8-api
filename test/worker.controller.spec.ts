@@ -81,14 +81,14 @@ describe('tests the worker controller', () => {
 
     it('gets all the workers', async () => {
       const data = await workerController.findAll(mockGet('/worker', { companyId: 1 }));
-      expect(data.length).toBe(6);
+      expect(data.length).toBe(7);
     });
 
     it('updates the admin', async () => {
-      const adminWorker = await workerController.findById(mockGet('/worker/4', { companyId: 1 }), 4);
-      expect(adminWorker.email).toBe('admin1@gmail.com');
+      const adminWorker = await workerController.findById(mockGet('/worker/1', { companyId: 1 }), 1);
+      expect(adminWorker.email).toBe('admin@email.com');
       const newAdmin = genWorker(false, true, false, 'admin2@gmail.com', null);
-      const data = await workerController.update(mockPost('/worker/4', newAdmin, { companyId: 1 }), 4, newAdmin);
+      const data = await workerController.update(mockPost('/worker/1', newAdmin, { companyId: 1 }), 1, newAdmin);
       expect(data.email).toBe('admin2@gmail.com');
     });
 
