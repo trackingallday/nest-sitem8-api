@@ -47,6 +47,7 @@ export class TimesheetEntryService {
   async update(props: TimesheetEntryDto):Promise<TimesheetEntry> {
     const ts = await this.findById(props.id);
     await ts.update(props);
+    await ts.reload();
     return ts;
   }
 
@@ -84,7 +85,7 @@ export class TimesheetEntryService {
         { model: Timesheet, where: workerId }
       ],
       order: [
-        ['finish_date_time', 'DESC'],
+        ['finish_date_time', 'ASC'],
       ],
     });
   }
