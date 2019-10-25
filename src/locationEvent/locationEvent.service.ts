@@ -85,7 +85,6 @@ export class LocationEventService {
 
   async createFromLocationTimestamp(loc: LocationTimestamp, previousLocs: LocationTimestamp[],
       timeSettings: any, company: Company): Promise<LocationEvent> {
-
     let locEvt:any = {};
 
     locEvt.locationTimestampId = loc.id;
@@ -131,7 +130,7 @@ export class LocationEventService {
     const isWithinToleranceDuration = toleraceDurationSec < latestTimeSec;
     const isTooFarAway = loc.closestSiteDistance > absoluteMaXOnSiteDistanceM;
 
-    const canExit = (!isWithinMaxDistance && canEnterExitSpeed && isWithinSpeedAccuracy) || !isWithinToleranceDuration;
+    const canExit = (!isWithinMaxDistance && canEnterExitSpeed && isWithinSpeedAccuracy);
     const canEnter = isWithinMaxDistance && canEnterExitSpeed && isWithinSpeedAccuracy;
 
     if ([ENTER_SITE, ON_SITE].includes(latestEventType)){
