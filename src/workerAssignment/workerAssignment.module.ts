@@ -12,5 +12,6 @@ import { DatabaseModule } from '../db/database.module';
     WorkerAssignmentService,
     ...WorkerAssignmentProvider,
   ],
+  exports: [WorkerAssignmentService],
 })
 export class WorkerAssignmentModule {}

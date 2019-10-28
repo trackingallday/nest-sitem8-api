@@ -19,3 +19,14 @@ export const TimesheetFormat = {
   GroupByWorkerDay : 1,
   GroupByTimesheetEntry : 2,
 };
+
+export const ExportTimesheetCSVHeaders = [
+  { label: 'Payroll ID', value: 'payrollId' },
+  { label: 'Name', value: 'name' },
+  { label: 'Site ID', value: 'siteIds' },
+  { label: 'Site', value: 'siteName' },
+  { label: 'Date', value: 'dayWorked' },
+  { label: 'Start time', value: 'startDateTimeValue' },
+  { label: 'Finish time', value: 'finishDateTimeValue' },
+  { label: 'status', value: 'statusValue' },
+];

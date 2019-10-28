@@ -12,5 +12,6 @@ import { DatabaseModule } from '../db/database.module';
     DayOfWeekTimeSettingService,
     ...DayOfWeekTimeSettingProvider,
   ],
+  exports: [DayOfWeekTimeSettingService],
 })
 export class DayOfWeekTimeSettingModule {}

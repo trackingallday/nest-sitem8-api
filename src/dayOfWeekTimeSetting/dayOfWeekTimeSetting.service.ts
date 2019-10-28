@@ -2,7 +2,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DayOfWeekTimeSetting } from './dayOfWeekTimeSetting.entity';
 import { DayOfWeekTimeSettingInterface } from './dayOfWeekTimeSetting.interface';
-import constants from '../constants'
+import constants from '../constants';
+import { SiteAssignment } from '../siteAssignment/siteAssignment.entity';
 
 @Injectable()
 export class DayOfWeekTimeSettingService {
@@ -29,5 +30,8 @@ export class DayOfWeekTimeSettingService {
     return await this.DAYOFWEEKTIMESETTING_REPOSITORY.findByPk<DayOfWeekTimeSetting>(id);
   }
 
+  async createForSiteAssignment( dayOfWeekTimeSettings: DayOfWeekTimeSetting[], siteAssignment: SiteAssignment) {
+    dayOfWeekTimeSettings.map(m => { m.siteAssignment = siteAssignment, m.siteAssignmentId = siteAssignment.id; });
+    return await this.DAYOFWEEKTIMESETTING_REPOSITORY.bulkCreate(dayOfWeekTimeSettings);
+  }
 }
-

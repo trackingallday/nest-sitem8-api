@@ -26,7 +26,7 @@ export default async function() {
 
   await new Promise((res) => setTimeout(res, 5000));
 
-  //clear all data - reset autoincrements
+  // clear all data - reset autoincrements
   await Promise.all(tables.map(async t => await sequelize.query(`TRUNCATE TABLE ${t} CASCADE`)));
   await Promise.all(tables.map(async t => await sequelize.query(`ALTER SEQUENCE ${t}_id_seq RESTART WITH 1`)));
 

@@ -39,8 +39,7 @@ export class DayOfWeekTimeSetting extends Model<DayOfWeekTimeSetting> {
   @Column(DataType.STRING)
   maximumLunchEnd: string;
 
-  @BelongsTo(() => SiteAssignment, 'siteAssignmentId')
+  @BelongsTo(() => SiteAssignment)
   siteAssignment: SiteAssignment;
 
 }
-

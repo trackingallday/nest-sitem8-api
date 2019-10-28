@@ -1,6 +1,7 @@
 
 import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
+import { SiteAssignment } from '../siteAssignment/siteAssignment.entity';
 
 @Table({ tableName: 'site', modelName: 'site', underscored: true })
 export class Site extends Model<Site> {
@@ -25,5 +26,8 @@ export class Site extends Model<Site> {
 
   @HasMany(() => TimesheetEntry)
   timesheetEntry: TimesheetEntry[];
+
+  @HasMany(() => SiteAssignment)
+  siteAssignments: SiteAssignment[];
 
 }
