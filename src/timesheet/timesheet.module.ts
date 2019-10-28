@@ -9,7 +9,6 @@ import { LocationTimestampModule } from '../locationTimestamp/locationTimestamp.
 import { WorkerModule } from '../worker/worker.module';
 import { SiteModule } from '../site/site.module';
 
-
 @Module({
   imports: [DatabaseModule, WorkerModule, SiteModule, TimesheetEntryModule, LocationTimestampModule],
   controllers: [TimesheetController],
@@ -17,6 +16,6 @@ import { SiteModule } from '../site/site.module';
     ...TimesheetProvider,
     TimesheetService,
   ],
-  exports: [TimesheetService]
+  exports: [TimesheetService],
 })
 export class TimesheetModule {}

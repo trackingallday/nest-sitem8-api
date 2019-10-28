@@ -12,5 +12,6 @@ import { DatabaseModule } from '../db/database.module';
     NotificationService,
     ...NotificationProvider,
   ],
+  exports: [NotificationService],
 })
 export class NotificationModule {}

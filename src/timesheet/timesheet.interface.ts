@@ -18,7 +18,11 @@ export class TimesheetViewInterface {
   timesheetId: number;
   dayWorked: Date;
   status: number;
+  statusValue: string;
   companyId: number;
   startDateTime: Date;
   finishDateTime: Date;
+  groupedTimesheetViewsColumn: string;
+  hoursBreak: number;
+  siteIds: string;
 }

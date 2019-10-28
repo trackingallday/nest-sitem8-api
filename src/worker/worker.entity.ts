@@ -3,6 +3,7 @@ import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo } from '
 import { Notification } from '../notification/notification.entity';
 import { Company } from '../company/company.entity';
 import { Timesheet } from '../timesheet/timesheet.entity';
+import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
 
 @Table({ tableName: 'worker', modelName: 'worker', underscored: true })
 export class Worker extends Model<Worker> {
@@ -67,4 +68,7 @@ export class Worker extends Model<Worker> {
 
   @HasMany(() => Timesheet)
   timesheets: Timesheet[];
+
+  @HasMany(() => WorkerAssignment)
+  workerAssignments: WorkerAssignment[];
 }

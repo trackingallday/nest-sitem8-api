@@ -60,7 +60,7 @@ export default {
     authId: 'worker2@email.com',
     companyId: 1,
     mobile: '',
-    payrollId: '',
+    payrollId: '2',
     supervisor: 2,
     mobileNotifications: true,
     emailNotifications: true,
@@ -85,55 +85,77 @@ export default {
   device2: {
     deviceId: '00000053145345',
   },
+  timesheet: {
+    startDateTime: new Date(2019, 8, 25, 24, 0),
+    finishDateTime: new Date(2019, 9, 1, 12, 0),
+    status: 1,
+  },
+  timesheetEntries: [
+    {
+      startDateTime: new Date(2019, 8, 26, 4, 32),
+      finishDateTime: new Date(2019, 8, 26, 6, 0),
+      description: 'Calculated from GPS',
+    },
+    {
+      startDateTime: new Date(2019, 8, 30, 7, 11),
+      finishDateTime: new Date(2019, 8, 30, 9, 31),
+      description: 'Calculated from GPS',
+    },
+    {
+      startDateTime: new Date(2019, 8, 30, 9, 31),
+      finishDateTime: new Date(2019, 8, 30, 10, 28),
+      description: 'Calculated from GPS',
+    },
+  ],
   site: {
     name: 'Test Site',
     companyId: 1,
     sitePayrollId: '23462346246',
     active: true,
     geom: {
-      "type": "Polygon",
-      "coordinates":  [
+      type: 'Polygon',
+      coordinates:  [
         [
           [
             172.63907468368518,
-            -43.5332059704003
+            -43.5332059704003,
           ],
           [
             172.63905322601306,
-            -43.53345487040692
+            -43.53345487040692,
           ],
           [
             172.63946092178332,
-            -43.53349376094017
+            -43.53349376094017,
           ],
           [
             172.63950383712756,
-            -43.533167079681476
+            -43.533167079681476,
           ],
           [
             172.63907468368518,
-            -43.5332059704003
-          ]
-        ]
-      ]
+            -43.5332059704003,
+          ],
+        ],
+      ],
     },
   },
   nearOrbicaPoints: [
     [
       172.6392570738982,
-      -43.53334597678043
+      -43.53334597678043,
     ],
     [
       172.63952529479968,
-      -43.53285595302797
+      -43.53285595302797,
     ],
     [
       172.63990080406177,
-      -43.53321374854106
+      -43.53321374854106,
     ],
     [
       172.63884937812793,
-      -43.533275973631
+      -43.533275973631,
     ],
-  ]
-}
+  ],
+};

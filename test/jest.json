@@ -10,6 +10,7 @@
     "<rootDir>/jest.setup.js"
   ],
   "globalSetup": "<rootDir>/setup.ts",
+ 
   "globalTeardown": "<rootDir>/teardown.ts",
   "globals": {
     "ts-jest": {

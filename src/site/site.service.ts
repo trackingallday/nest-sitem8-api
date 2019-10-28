@@ -12,12 +12,12 @@ export class SiteService {
     return await this.SITE_REPOSITORY.findAll<Site>();
   }
 
-  //AddSite
+  // AddSite
   async create(props: SiteInterface): Promise<Site> {
     return await this.SITE_REPOSITORY.create<Site>(props);
   }
 
-  //GetSites
+  // GetSites
   async findAllWhere(props): Promise<Site[]> {
     return await this.SITE_REPOSITORY.findAll<Site>(props);
   }
@@ -26,13 +26,13 @@ export class SiteService {
     return await this.SITE_REPOSITORY.findOne<Site>(props);
   }
 
-  //GetSite
+  // GetSite
   async findById(id): Promise<Site> {
     return await this.SITE_REPOSITORY.findByPk<Site>(id);
   }
 
-  //UpdateSite
-  async updateOne(id:number, props: any): Promise<Site> {
+  // UpdateSite
+  async updateOne(id: number, props: any): Promise<Site> {
     const item = await this.findById(props);
     item.set(props);
     await item.save();
@@ -42,7 +42,7 @@ export class SiteService {
   async getClosestAssignedSiteId(lat: number, lon: number, excludedIds: number[], companyId: number): Promise<number> {
     const sql = `
       SELECT id from site
-      WHERE id NOT IN (${excludedIds.length ? excludedIds.join(",") : 0})
+      WHERE id NOT IN (${excludedIds.length ? excludedIds.join(',') : 0})
         AND company_id = ${companyId}
       ORDER BY
       ST_Distance_Sphere(
@@ -52,8 +52,8 @@ export class SiteService {
       ASC
       LIMIT 1;
     `;
-    const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    return res[0].length ? parseInt(res[0][0]['id']) : null;
+    const res: any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    return res[0].length ? parseInt(res[0][0].id) : null;
   }
 
   async getDistanceToSite(siteId: number, lat: number, lon: number): Promise<number> {
@@ -66,9 +66,12 @@ export class SiteService {
       FROM site where site.id = ${siteId}
       LIMIT 1;
     `;
-    const res:any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
-    return res[0].length ? parseFloat(res[0][0]['distance_meters']) : null;
+    const res: any = await this.SITE_REPOSITORY.sequelize.query(sql, { raw: true });
+    return res[0].length ? parseFloat(res[0][0].distance_meters) : null;
+  }
+
+  async getActiveSitesByCompanyId(companyId: number): Promise<Site[]> {
+    return await this.findAllWhere({ companyId, active: true});
   }
 
 }
-

@@ -35,26 +35,6 @@
       ]
     },
     {
-      "name": "Debug Jest Tests",
-      "type": "node",
-      "request": "launch",
-      "runtimeArgs": [
-        "--inspect-brk",
-        "${workspaceRoot}/node_modules/jest/bin/jest.js",
-        "--runInBand", "--coverage", "false"
-      ],
-      "args": [
-                "-c",
-          "./test/jest.json",
-                "--verbose",
-                "-i",
-                "--no-cache"
-              ],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "port": 9229
-    },
-    {
       "type": "node",
       "request": "launch",
       "name": "Jest Current File",

@@ -15,9 +15,7 @@ import { ValidationPipe } from '../common/validation.pipe';
 import * as momenttz from 'moment-timezone';
 import { isEmpty } from 'lodash';
 
-
 /* combining the timesheet entries endpoints and the timesheet endpoints as they are totally related and dependent */
-
 
 @Controller('timesheet')
 export class TimesheetController {
@@ -29,18 +27,18 @@ export class TimesheetController {
               private readonly locationTimestampService: LocationTimestampService,
   ) { }
 
-    //req is any because we customise that
-  async validateWorkerIds(req:any, workerIds: number[]) {
+    // req is any because we customise that
+  async validateWorkerIds(req: any, workerIds: number[]) {
     const validWorkers = await this.workerService.validateWorkerCompanyIds(
       workerIds, req.dbUser.companyId);
-    if(!validWorkers) {
+    if (!validWorkers) {
       throw new HttpException('Illegal access', HttpStatus.FORBIDDEN);
     }
   }
 
-  //timesheet must include the worker
-  async validateTimesheet(req:any, ts: Timesheet) {
-    if(ts.worker.companyId !== req.dbUser.companyId) {
+  // timesheet must include the worker
+  async validateTimesheet(req: any, ts: Timesheet) {
+    if (ts.worker.companyId !== req.dbUser.companyId) {
       throw new HttpException('Illegal access', HttpStatus.FORBIDDEN);
     }
   }
@@ -51,7 +49,7 @@ export class TimesheetController {
   }
 
   @Post('createtimesheet')
-  async create(@Req() req:any, @Body() timesheet: TimesheetDto): Promise<Timesheet> {
+  async create(@Req() req: any, @Body() timesheet: TimesheetDto): Promise<Timesheet> {
     await this.validateWorkerIds(req, [timesheet.workerId]);
     return await this.timesheetService.create(timesheet);
   }
@@ -71,7 +69,7 @@ export class TimesheetController {
   async savemanyentries(@Req() req, @Param() timesheetId: number, @Body() timesheetEntrys: TimesheetEntryDto[]) {
     const ts = await this.timesheetService.findById(timesheetId);
     await this.validateWorkerIds(req, [ts.workerId]);
-    if(timesheetEntrys.find(tse => !!(tse.id || tse.timesheetId))) {
+    if (timesheetEntrys.find(tse => !!(tse.id || tse.timesheetId))) {
       throw new HttpException('existing timesheet ids cant be saved again', HttpStatus.BAD_REQUEST);
     }
     return await this.timesheetEntryService.createMany(timesheetEntrys.map(t => ({ ...t, timesheetId })));
@@ -86,20 +84,20 @@ export class TimesheetController {
   }
 
   @Get('timesheetentries/:timesheetId')
-  async getTimesheetEntries(@Req() req:any, @Param() timesheetId: number): Promise<TimesheetEntry[]> {
+  async getTimesheetEntries(@Req() req: any, @Param() timesheetId: number): Promise<TimesheetEntry[]> {
     const ts = await this.timesheetService.findByIdWithWorkerAndEntries(timesheetId);
     this.validateTimesheet(req, ts);
     return ts.timesheetEntrys;
   }
 
   @Post('timesheetentriesbydaterange/:workerId')
-  async getTimesheetEntriesByDateRange(@Req() req:any, @Param() workerId: number, @Body() dateRange: any): Promise<TimesheetEntry[]> {
+  async getTimesheetEntriesByDateRange(@Req() req: any, @Param() workerId: number, @Body() dateRange: any): Promise<TimesheetEntry[]> {
     await this.validateWorkerIds(req, [workerId]);
     const tses = await this.timesheetEntryService.getEntriesBetween(dateRange.startDate, dateRange.endDate, workerId);
     const locationStartDate = isEmpty(tses) ? dateRange.startDate : tses[tses.length - 1].finishDateTime;
     const worker = await this.workerService.findById(workerId);
     const locs = await this.locationTimestampService.findByWorkerIdDateRange(locationStartDate, dateRange.endDate, workerId);
-    const locEvts:LocationEvent[] = locs.map(l => {
+    const locEvts: LocationEvent[] = locs.map(l => {
       const le = l.locationEvent;
       le.locationTimestamp = l;
       return le;
@@ -134,7 +132,7 @@ export class TimesheetController {
 
   @Get('unlockedtimesheets')
   async getUnlockedTimesheets(companyId: number): Promise<Timesheet[]> {
-    //return await this.timesheetService.getUnlockedTimesheets(companyId);
+    // return await this.timesheetService.getUnlockedTimesheets(companyId);
   }
 
   @Post('settimesheetstatus')
@@ -169,8 +167,8 @@ export class TimesheetController {
   }
 
   @Get('timesheetexport/:id/:format')
-  async exportTimesheet(@Param() id: number, @Param() TimesheetFormat: number) {
-   // todo
+  async exportTimesheet(@Param() id: number, @Param() companyId: number, @Param() timesheetFormat: number, @Param() timesheetStatus: number) {
+   return await this.timesheetService.exportTimesheets(id, companyId, timesheetFormat, timesheetStatus);
   }
 
   @Get('locktimesheets/:id')
