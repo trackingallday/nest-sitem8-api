@@ -1,58 +1,127 @@
 
-import { Get, Post, Body, Param, Controller, UsePipes, Req } from '@nestjs/common';
+import { Get, Post, Body, Param, Controller, UsePipes, Req, HttpException, HttpStatus  } from '@nestjs/common';
 import { TimesheetService } from './timesheet.service';
 import { AccessTokenService } from '../accessToken/accessToken.service';
 import { WorkerService } from '../worker/worker.service';
+import { LocationTimestampService } from '../locationTimestamp/locationTimestamp.service';
+import { TimesheetEntryService } from '../timesheetEntry/timesheetEntry.service';
 import { SiteService } from '../site/site.service';
 import { Timesheet } from './timesheet.entity';
-import TimesheetDto from './timesheet.dto';
+import { LocationEvent } from '../locationEvent/locationEvent.entity';
+import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
+import { TimesheetDto } from './timesheet.dto';
+import { TimesheetEntryDto } from '../timesheetEntry/timesheetEntry.dto';
 import { ValidationPipe } from '../common/validation.pipe';
-import { Worker } from '../worker/worker.entity';
+import * as momenttz from 'moment-timezone';
+import { isEmpty } from 'lodash';
+
+
+/* combining the timesheet entries endpoints and the timesheet endpoints as they are totally related and dependent */
+
 
 @Controller('timesheet')
 export class TimesheetController {
 
   constructor(private readonly timesheetService: TimesheetService,
-              private readonly accesstokenService: AccessTokenService,
               private readonly workerService: WorkerService,
               private readonly siteService: SiteService,
+              private readonly timesheetEntryService: TimesheetEntryService,
+              private readonly locationTimestampService: LocationTimestampService,
   ) { }
 
-  @Get()
+    //req is any because we customise that
+  async validateWorkerIds(req:any, workerIds: number[]) {
+    const validWorkers = await this.workerService.validateWorkerCompanyIds(
+      workerIds, req.dbUser.companyId);
+    if(!validWorkers) {
+      throw new HttpException('Illegal access', HttpStatus.FORBIDDEN);
+    }
+  }
+
+  //timesheet must include the worker
+  async validateTimesheet(req:any, ts: Timesheet) {
+    if(ts.worker.companyId !== req.dbUser.companyId) {
+      throw new HttpException('Illegal access', HttpStatus.FORBIDDEN);
+    }
+  }
+
+  @Get('timesheet/')
   async findAll(): Promise<Timesheet[]> {
     return this.timesheetService.findAll();
   }
 
-  // @Get('/:id')
-  // async findById(@Param() params): Promise<Timesheet> {
-  //   return this.timesheetService.findById(parseInt(params.id));
-  // }
-
-  @Post()
-  @UsePipes(new ValidationPipe())
-  async create(@Body() timesheet: TimesheetDto) {
-    this.timesheetService.create(timesheet);
+  @Post('createtimesheet')
+  async create(@Req() req:any, @Body() timesheet: TimesheetDto): Promise<Timesheet> {
+    await this.validateWorkerIds(req, [timesheet.workerId]);
+    return await this.timesheetService.create(timesheet);
   }
 
-  // @Post('/:id')
-  // @UsePipes(new ValidationPipe())
-  // async update(@Param() id: number, @Body() timesheet: TimesheetDto) {
-  //   const thisTimesheet = await this.timesheetService.findById(id);
-  //   thisTimesheet.set(timesheet);
-  //   await thisTimesheet.save();
-  //   return thisTimesheet;
-  // }
-
-  @Get('mytimesheet/data/:company/:token')
-  async myTimesheet(@Param() params): Promise<any> {
-    const worker: Worker = await this.accesstokenService.getWorkerFromAccessToken(params.token);
-    const companyId: number = worker.companyId;
+  @Get('mytimesheet/data/:token')
+  async myTimesheet(@Req() req): Promise<any> {
+    const companyId: number = req.dbUser.companyId;
     const retvals = {
       worker: await this.workerService.getWorkersByCompany(companyId, false),
       sites: await this.siteService.findAllWhere({ companyId }),
     };
     return retvals;
   }
+
+  @Post('savemanyentries/:timesheetId')
+  @UsePipes(new ValidationPipe())
+  async savemanyentries(@Req() req, @Param() timesheetId: number, @Body() timesheetEntrys: TimesheetEntryDto[]) {
+    const ts = await this.timesheetService.findById(timesheetId);
+    await this.validateWorkerIds(req, [ts.workerId]);
+    if(timesheetEntrys.find(tse => !!(tse.id || tse.timesheetId))) {
+      throw new HttpException('existing timesheet ids cant be saved again', HttpStatus.BAD_REQUEST);
+    }
+    return await this.timesheetEntryService.createMany(timesheetEntrys.map(t => ({ ...t, timesheetId })));
+  }
+
+  @Post('updateoneentry')
+  @UsePipes(new ValidationPipe())
+  async update(@Req() req, @Body() timesheetEntry: TimesheetEntryDto) {
+    const tse = await this.timesheetEntryService.findById(timesheetEntry.id);
+    await this.validateWorkerIds(req, [tse.timesheet.workerId]);
+    return await this.timesheetEntryService.update(timesheetEntry);
+  }
+
+  @Get('timesheetentries/:timesheetId')
+  async getTimesheetEntries(@Req() req:any, @Param() timesheetId: number): Promise<TimesheetEntry[]> {
+    const ts = await this.timesheetService.findByIdWithWorkerAndEntries(timesheetId);
+    this.validateTimesheet(req, ts);
+    return ts.timesheetEntrys;
+  }
+
+  @Post('timesheetentriesbydaterange/:workerId')
+  async getTimesheetEntriesByDateRange(@Req() req:any, @Param() workerId: number, @Body() dateRange: any): Promise<TimesheetEntry[]> {
+    await this.validateWorkerIds(req, [workerId]);
+    const tses = await this.timesheetEntryService.getEntriesBetween(dateRange.startDate, dateRange.endDate, workerId);
+    const locationStartDate = isEmpty(tses) ? dateRange.startDate : tses[tses.length - 1].finishDateTime;
+    const worker = await this.workerService.findById(workerId);
+    const locs = await this.locationTimestampService.findByWorkerIdDateRange(locationStartDate, dateRange.endDate, workerId);
+    const locEvts:LocationEvent[] = locs.map(l => {
+      const le = l.locationEvent;
+      le.locationTimestamp = l;
+      return le;
+    });
+    const generatedEntries = this.timesheetEntryService.generateTimesheetEntries(locEvts, worker.company, 'Pacific/Auckland');
+    const entries =  [...tses, ...generatedEntries];
+    entries.sort((a, b) => {
+      return momenttz(a.startDateTime).isBefore(momenttz(b.startDateTime)) ? -1 : 1;
+    });
+    return entries;
+  }
+
+  /*@Get('mytimesheet/timesheetentries/:token/:id')
+  async getTimesheetEntries(@Param() params): Promise<TimesheetEntry[]> {
+    return await this.timesheetEntryService.getTimesheetEntriesByTimesheetIdForCompany(params.id, params.companyId);
+  }*/
+
+  /*@Post('updatetimesheetentries')
+  @UsePipes(new ValidationPipe())
+  async updateTimesheetEntries(@Req() req, @Body() timesheetEntries: TimesheetEntryDto[], @Body() timesheetId: number) {
+    this.timesheetEntryService.overwriteTimesheetEntries(timesheetEntries, timesheetId, req.dbUser.name, req.dbUser.workerId);
+  }*/
 
   @Get('approvalsdata/:companyId')
   async getApprovalsData(@Param() companyId: number): Promise<any> {
@@ -65,7 +134,7 @@ export class TimesheetController {
 
   @Get('unlockedtimesheets')
   async getUnlockedTimesheets(companyId: number): Promise<Timesheet[]> {
-    return await this.timesheetService.getUnlockedTimesheets(companyId);
+    //return await this.timesheetService.getUnlockedTimesheets(companyId);
   }
 
   @Post('settimesheetstatus')
@@ -85,9 +154,8 @@ export class TimesheetController {
   }
 
   @Get('mydistincttimesheets/:token/:companyId')
-  async getMyDistinctTimesheets(@Param() token: string, @Param() companyId: number) {
-    const worker: Worker = await this.accesstokenService.getWorkerFromAccessToken(token);
-    return await this.timesheetService.getDistinctTimesheets(companyId, worker.workerId);
+  async getMyDistinctTimesheets(@Req() req, @Param() token: string, @Param() companyId: number) {
+    return await this.timesheetService.getDistinctTimesheets(companyId, req.dbUser.workerId);
   }
 
   @Get('timesheetexport/:id/:format')

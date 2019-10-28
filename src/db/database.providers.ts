@@ -26,7 +26,8 @@ export const databaseProviders = [
       const sequelize = new Sequelize(DBDATABASE, DBPOSTGRESUSERNAME, DBPASSWORD, {
         dialect: 'postgres',
         logging: false,
-        dialectOptions: { decimalNumbers: true },
+        dialectOptions: { decimalNumbers: true, useUTC: true },
+        timezone: '+00:00',
       });
 
       sequelize.addModels([

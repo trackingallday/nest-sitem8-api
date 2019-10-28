@@ -8,8 +8,8 @@ import { TimesheetNote } from '../timesheetNote/timesheetNote.entity';
 @Table({ tableName: 'timesheet', modelName: 'timesheet', underscored: true })
 export class Timesheet extends Model<Timesheet> {
 
-  @Column(DataType.INTEGER)
-  timesheetId: number;
+  /*@Column(DataType.INTEGER)
+  timesheetId: number;*/
 
   @Column(DataType.DATE)
   startDateTime: Date;
@@ -28,15 +28,15 @@ export class Timesheet extends Model<Timesheet> {
   worker: Worker;
 
   @HasMany(() => TimesheetEntry)
-  timesheetEntry: TimesheetEntry[];
+  timesheetEntrys: TimesheetEntry[];
 
-  @ForeignKey(() => Company)
+  /*@ForeignKey(() => Company)
   @Column(DataType.INTEGER)
   companyId: number;
 
   @BelongsTo(() => Company)
-  company: Company;
+  company: Company;*/
 
   @HasMany(() => TimesheetNote)
-  timesheetNote: TimesheetNote[];
+  timesheetNotes: TimesheetNote[];
 }

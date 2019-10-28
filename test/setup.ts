@@ -7,8 +7,8 @@ import { Worker } from '../src/worker/worker.entity';
 import { Device } from '../src/device/device.entity';
 import { Site } from '../src/site/site.entity';
 import { LocationTimestamp } from '../src/locationTimestamp/locationTimestamp.entity';
-import { genLocationTimestamp } from './dataGenerators';
-import testconstants from './test-constants';
+import { genLocationTimestamp } from './utils/dataGenerators';
+import testconstants from './testdata/test-constants';
 
 
 async function setupAsync() {
@@ -22,14 +22,15 @@ async function setupAsync() {
 
   await companyRepo.create(testconstants.company);
 
-  await workerRepo.create(testconstants.admin);
-  await workerRepo.create(testconstants.supervisor);
-  await workerRepo.create(testconstants.worker);
+  await workerRepo.create(testconstants.admin);// id 1
+  await workerRepo.create(testconstants.supervisor);// id 2
+  await workerRepo.create(testconstants.worker);// id 3
+  await workerRepo.create(testconstants.worker2);//id 4
 
-  await deviceRepo.create(testconstants.device);
+  await deviceRepo.create(testconstants.device);// id 1
+  await deviceRepo.create(testconstants.device2);// id 2
 
-  await siteRepo.create(testconstants.site);
-
+  await siteRepo.create(testconstants.site);// 1
 
   const locs = testconstants.nearOrbicaPoints.map(
     (c, i) => genLocationTimestamp(testconstants.device.deviceId, c[1], c[0], i));
@@ -37,11 +38,8 @@ async function setupAsync() {
   await locRepo.bulkCreate(locs.map(
     (l, i) => ({ ...l, closestSiteId: 1, closestSiteDistance: i * 30, workerId: 3 })));
 
-  console.log('************************SETUP IS DONE');
 }
 
 export default async function setup() {
-  let a = 'a';
-  let b = 'b';
   await setupAsync();
 }

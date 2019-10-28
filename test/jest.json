@@ -6,6 +6,9 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
+  "setupFilesAfterEnv": [
+    "<rootDir>/jest.setup.js"
+  ],
   "globalSetup": "<rootDir>/setup.ts",
   "globalTeardown": "<rootDir>/teardown.ts",
   "globals": {

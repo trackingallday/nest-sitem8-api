@@ -4,7 +4,7 @@ import constants from '../constants';
 
 const { auth0_m2m_api } = constants;
 
-const baseUrl = "https://sitem8.au.auth0.com/";
+export const baseUrl = "https://sitem8.au.auth0.com/";
 
 const tokenCredentials =  {
   grant_type: "client_credentials",
