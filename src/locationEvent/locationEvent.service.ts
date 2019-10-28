@@ -11,6 +11,7 @@ import { DayOfWeekTimeSetting } from '../dayOfWeekTimeSetting/dayOfWeekTimeSetti
 import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
 import { mtzFromDateTimeTZ, mtzFromTimeStr } from '../utils/dateUtils';
 import { eventTypeEnum } from './constants';
+import { sortBy } from 'lodash';
 
 const { ENTER_SITE, EXIT_SITE, ON_SITE, OFF_SITE, PRIVACY_BLOCKED } = eventTypeEnum;
 
@@ -105,19 +106,19 @@ export class LocationEventService {
     if(isPrivacyBlocked(loc, timeSettings, tzStr)) {
       return PRIVACY_BLOCKED;
     }
-    previousLocs.sort((a, b) => {
-      return momenttz(a.locationDateTime).isBefore(momenttz(b.locationDateTime)) ? -1 : 1;
-    });
-    const latestLoc = previousLocs[previousLocs.length - 1];
+
+    const sortedLocs = sortBy(previousLocs, a => a.locationDateTime.getTime());
+
+    const latestLoc = sortedLocs[sortedLocs.length - 1];
     const latestEvent = latestLoc.locationEvent;
     const latestEventType = latestEvent ? latestEvent.eventType : PRIVACY_BLOCKED;
 
     const currentTimeUtc = momenttz.utc(loc.locationDateTime);
     const toleraceDurationSec = momenttz.duration(company.glitchRemovalPeriod).asSeconds();
-    const totalTimeSec = Math.abs(momenttz.utc(previousLocs[0].locationDateTime).diff(currentTimeUtc, 'seconds')) || 1;
+    const totalTimeSec = Math.abs(momenttz.utc(sortedLocs[0].locationDateTime).diff(currentTimeUtc, 'seconds')) || 1;
     const latestTimeSec = Math.abs(momenttz.utc(latestLoc.locationDateTime).diff(currentTimeUtc, 'seconds')) || 1;
 
-    const totalDistanceM = await this.getDistanceM(previousLocs[0].latitude, previousLocs[0].longitude, loc.latitude, loc.longitude);
+    const totalDistanceM = await this.getDistanceM(sortedLocs[0].latitude, sortedLocs[0].longitude, loc.latitude, loc.longitude);
     const latestDistanceM = await this.getDistanceM(latestLoc.latitude, latestLoc.longitude, loc.latitude, loc.longitude);
 
     const totalSpeedMSec = totalDistanceM > 0 ? totalDistanceM / totalTimeSec : 0;

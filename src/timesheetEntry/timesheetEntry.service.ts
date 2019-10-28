@@ -108,7 +108,7 @@ export class TimesheetEntryService {
           tse.siteId = le.locationTimestamp.closestSiteId;
           entries.push(tse);
         case EXIT_SITE:
-          if(entries.length) {
+          if(!isEmpty(entries)) {
             entries[entries.length - 1].finishDateTime = le.locationTimestamp.locationDateTime;
           }
       }

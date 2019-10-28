@@ -13,6 +13,7 @@ import { TimesheetDto } from './timesheet.dto';
 import { TimesheetEntryDto } from '../timesheetEntry/timesheetEntry.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 import * as momenttz from 'moment-timezone';
+import { isEmpty } from 'lodash';
 
 
 /* combining the timesheet entries endpoints and the timesheet endpoints as they are totally related and dependent */
@@ -52,8 +53,7 @@ export class TimesheetController {
   @Post('createtimesheet')
   async create(@Req() req:any, @Body() timesheet: TimesheetDto): Promise<Timesheet> {
     await this.validateWorkerIds(req, [timesheet.workerId]);
-    const ts = await this.timesheetService.create(timesheet);
-    return ts;
+    return await this.timesheetService.create(timesheet);
   }
 
   @Get('mytimesheet/data/:token')
@@ -74,8 +74,7 @@ export class TimesheetController {
     if(timesheetEntrys.find(tse => !!(tse.id || tse.timesheetId))) {
       throw new HttpException('existing timesheet ids cant be saved again', HttpStatus.BAD_REQUEST);
     }
-    const res = await this.timesheetEntryService.createMany(timesheetEntrys.map(t => ({ ...t, timesheetId })));
-    return res;
+    return await this.timesheetEntryService.createMany(timesheetEntrys.map(t => ({ ...t, timesheetId })));
   }
 
   @Post('updateoneentry')
@@ -97,8 +96,7 @@ export class TimesheetController {
   async getTimesheetEntriesByDateRange(@Req() req:any, @Param() workerId: number, @Body() dateRange: any): Promise<TimesheetEntry[]> {
     await this.validateWorkerIds(req, [workerId]);
     const tses = await this.timesheetEntryService.getEntriesBetween(dateRange.startDate, dateRange.endDate, workerId);
-    const lastEntry = tses[tses.length - 1];
-    const locationStartDate = lastEntry ? lastEntry.finishDateTime : dateRange.startDate;
+    const locationStartDate = isEmpty(tses) ? dateRange.startDate : tses[tses.length - 1].finishDateTime;
     const worker = await this.workerService.findById(workerId);
     const locs = await this.locationTimestampService.findByWorkerIdDateRange(locationStartDate, dateRange.endDate, workerId);
     const locEvts:LocationEvent[] = locs.map(l => {

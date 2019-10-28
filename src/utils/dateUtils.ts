@@ -1,5 +1,6 @@
 var momenttz = require('moment-timezone');
 
+//timeStr 24hr ISO time 'HH:mm', '07:00'
 export function mtzFromDateTimeTZ(dateutc, timeStr, tzStr) {
   var parts = timeStr.split(':');
   var hrs = parts[0];
@@ -10,6 +11,7 @@ export function mtzFromDateTimeTZ(dateutc, timeStr, tzStr) {
   return mDate;
 }
 
+//timeStr 24hr ISO time 'HH:mm', '07:00'
 export function mtzFromTimeStr(timeStr) {
   const parts = timeStr.split(':');
   var hrs = parts[0];

@@ -91,7 +91,7 @@ export class WorkerService {
 
   async validateWorkerCompanyIds(ids: number[], companyId: number): Promise<Boolean> {
     const workers = await this.findManyByIds(ids);
-    return workers.every(w => w.companyId === companyId);
+    return !workers.some(w => w.companyId !== companyId);
   }
 
 }

@@ -10,7 +10,7 @@ import { Worker } from '../worker/worker.entity';
 import * as momenttz from 'moment-timezone';
 import * as moment from 'moment';
 import { Sequelize } from 'sequelize-typescript';
-import { isNil } from 'lodash';
+import { isNil, isEmpty } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
 import { Site } from '../site/site.entity';
 
@@ -24,8 +24,7 @@ export class TimesheetService {
   }
 
   async create(props: any): Promise<Timesheet> {
-    const ts = await this.TIMESHEET_REPOSITORY.create<Timesheet>(props);
-    return ts;
+    return await this.TIMESHEET_REPOSITORY.create<Timesheet>(props);
   }
 
   async findAllWhere(props: any): Promise<Timesheet[]> {
