@@ -94,6 +94,15 @@ describe('tests the Location Timstamp Service', () => {
     expect(momenttz(onsiteEntries[1].startDateTime).format()).toBe('2018-09-03T01:17:45+00:00');
     expect(momenttz(onsiteEntries[1].finishDateTime).format()).toBe('2018-09-03T05:36:02+00:00');
 
+    /* for reference here is the results from the old system
+      id,timesheetId,startDateTime,finishDateTime,modifiedWorkerId,siteId,travel,description,WorkerId
+      3046,794,2018-09-02 19:16:00.000,2018-09-02 19:27:00.000,NULL,8,0,Calculated from GPS,146
+      3047,794,2018-09-02 19:27:00.000,2018-09-02 19:35:00.000,NULL,NULL,1,Calculated from GPS,146
+      3048,794,2018-09-02 19:35:00.000,2018-09-02 19:39:00.000,NULL,8,0,Calculated from GPS,146
+      3049,879,2018-09-02 20:06:00.000,2018-09-03 01:10:00.000,NULL,12,0,Calculated from GPS,146
+      3050,879,2018-09-03 01:17:00.000,2018-09-03 05:36:00.000,NULL,12,0,Calculated from GPS,146
+    */
+
     const isBlocked1 = isPrivacyBlocked(locs[0], company, 'Pacific/Auckland');
     expect(isBlocked1).toBeTruthy();
     const isBlocked2 = isPrivacyBlocked(locs[200], company, 'Pacific/Auckland');
