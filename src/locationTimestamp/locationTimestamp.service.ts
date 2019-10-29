@@ -5,6 +5,7 @@ import * as convertKeys from 'convert-keys';
 import { LocationTimestamp } from './locationTimestamp.entity';
 import { LocationTimestampInterface } from './locationTimestamp.interface';
 import { LocationEvent } from '../locationEvent/locationEvent.entity';
+import { Site } from '../site/site.entity';
 import constants from '../constants'
 
 @Injectable()
@@ -33,7 +34,7 @@ export class LocationTimestampService {
     return await this.LOCATIONTIMESTAMP_REPOSITORY.findByPk<LocationTimestamp>(id);
   }
 
-   // GetLocationTimestamps(DateTime startInclusive, DateTime finishExclusive, string DeviceId, bool includeNullLocations)
+   // GetLocationTimestamps(DateTime startInclusive, DateTime finishExclusive, string deviceId, bool includeNullLocations)
    async findByWorkerIdDateRange(startDate: Date, endDate: Date, workerId: number): Promise<LocationTimestamp[]> {
     const props = {
       where: {
@@ -58,7 +59,7 @@ export class LocationTimestampService {
     return locs;
   }
 
-  // GetLocationTimestamps(DateTime startInclusive, DateTime finishExclusive, string DeviceId, bool includeNullLocations)
+  // GetLocationTimestamps(DateTime startInclusive, DateTime finishExclusive, string deviceId, bool includeNullLocations)
   async findByDeviceIdDateRange(startDate: Date, endDate: Date, deviceId: string): Promise<LocationTimestamp[]> {
     const props = {
       where: {
@@ -127,19 +128,28 @@ export class LocationTimestampService {
     }
 
     const sql = `
-    SELECT q1.* from locationTimestamp AS q1 INNER JOIN
+      SELECT  q1.worker_id, w.name as workername, q1.location_date_time,
+      q1.battery, q1.closest_site_distance, q1.closest_site_id, s.name as sitename
+      
+      from locationTimestamp AS q1
+    
+      INNER JOIN
+      (
+        SELECT l.worker_id, MAX(l.creation_date_time) as max_time FROM locationtimestamp as l
+        WHERE l.worker_id in (${workerIds.join(',')})
+        GROUP BY l.worker_id
+      ) as q2
+  
+      ON q1.creation_date_time = q2.max_time
+  
+      join worker w on w.id = q1.worker_id
+    
+     left join site s on q1.closest_site_id = s.id;
 
-    (
-      SELECT l.worker_id, MAX(l.creation_date_time) as max_time FROM locationtimestamp as l
-      WHERE l.worker_id in (${workerIds.join(',')})
-      GROUP BY l.worker_id
-    ) as q2
-
-    ON q1.creation_date_time = q2.max_time
     `;
     const res:LocationTimestamp[] = await this.LOCATIONTIMESTAMP_REPOSITORY.sequelize.query(sql, {
-      raw: false,
-      type: QueryTypes.SELECT
+      raw: true,
+      type: QueryTypes.SELECT,
     });
     return res.map((l) => convertKeys.toCamel(l));
   }
