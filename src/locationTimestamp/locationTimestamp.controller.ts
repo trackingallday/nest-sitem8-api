@@ -65,18 +65,16 @@ export class LocationTimestampController {
 
   @Get('/latestlocationtimestamps')
   async getLatestLocations(@Req() req) {
-    var workerRes = await this.workerService.findAllWhere({
+    const workers = await this.workerService.findAllWhere({
       where: {
         companyId: req.dbUser.companyId,
         isEnabled: true,
       },
       attributes: ['id'],
     });
-    const ids:number[] = workerRes.map(w => w.toJSON()['id']);
+    const ids:number[] = workers.map(w => w.toJSON()['id']);
     // tslint:disable-next-line
     const locs = await this.locationTimestampService.getLatestByWorkerIds(ids);
     return locs;
   }
-
-
 }
