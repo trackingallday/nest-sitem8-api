@@ -16,7 +16,7 @@ export class WorkerController {
     return all;
   }
 
-  @Get('/:id')
+  @Get('getbyid/:id')
   async findById(@Req() req, @Param() id: number) {
     const worker = await this.workerService.findById(id);
     return worker;
@@ -52,5 +52,10 @@ export class WorkerController {
   async switchCompany(@Req() req, @Param() id: number) {
     await this.workerService.switchCompany(req.dbUser.id, id);
     return true;
+  }
+
+  @Get('/me')
+  async getMe(@Req() req) {
+    return req.dbUser;
   }
 }
