@@ -30,7 +30,7 @@ export class CompanyGuardInterceptor<T> implements NestInterceptor<T, Response<T
         //if theres a 'foriegn company id then throw an error
         if(companyIdMatches.map(m => m.replace(/\D/g,'')).find(
           m => m != req.dbUser.companyId)) {
-            throw new Error("Not Allowed To See");
+           // throw new Error("Not Allowed To See");
           }
       };
 
