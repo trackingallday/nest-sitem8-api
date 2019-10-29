@@ -6,8 +6,8 @@ import { Timesheet } from '../timesheet/timesheet.entity';
 @Table({ tableName: 'company', modelName: 'company', underscored: true })
 export class Company extends Model<Company> {
 
-  @Column(DataType.INTEGER)
-  companyId: number;
+ /* @Column(DataType.INTEGER)
+  companyId: number;*/
 
   @Column(DataType.STRING)
   name: string;
