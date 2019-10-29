@@ -42,14 +42,14 @@ import { ItemsController } from './items/items.controller';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [AppService],
 })
 export class AppModule {
 
  public configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthenticationMiddleware, DbUserMiddleware)
-      .exclude({ path: '/', method: RequestMethod.ALL })
-      .forRoutes(WorkerController, ItemsController);
+      .forRoutes('*');
   }
 
 }
