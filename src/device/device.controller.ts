@@ -6,15 +6,14 @@ import { DeviceDto } from './device.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
 
-@Controller('device')
+@Controller('devices')
 export class DeviceController {
 
   constructor(private readonly deviceService: DeviceService) {}
 
-  @Get()
+  @Get('getavailabledevices')
   async findAll(): Promise<any[]> {
-    const res = await this.deviceService.findAll();
-    return res.map(r => r.toJSON());
+    return [];
   }
 
   @Get('/:id')
