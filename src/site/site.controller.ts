@@ -1,24 +1,23 @@
 
-import { Get, Post, Body, Param, Controller, UsePipes  } from '@nestjs/common';
+import { Get, Post, Body, Param, Controller, UsePipes, Req  } from '@nestjs/common';
 import { SiteService } from './site.service';
 import { Site } from './site.entity';
 import SiteDto from './site.dto';
 import { ValidationPipe } from '../common/validation.pipe';
 
 
-@Controller('site')
+@Controller('sites')
 export class SiteController {
 
   constructor(private readonly siteService: SiteService) {}
 
-  @Get()
-  async findAll(): Promise<Site[]> {
-    return this.siteService.findAll();
-  }
-
-  @Get('/:id')
-  async findById(@Param() params): Promise<Site> {
-    return this.siteService.findById(parseInt(params.id));
+  @Get('/sites')
+  async findById(@Req() req:any): Promise<Site[]> {
+    return await this.siteService.findAllWhere({
+      where: {
+        companyId: req.dbUser.companyId,
+      }
+    });
   }
 
   @Post()
@@ -31,8 +30,7 @@ export class SiteController {
   @UsePipes(new ValidationPipe())
   async update(@Param() id: number, @Body() site: SiteDto) {
     const thisSite = await this.siteService.findById(id);
-    thisSite.set(site);
-    await thisSite.save();
+    await thisSite.update(site);
     return thisSite;
   }
 }
