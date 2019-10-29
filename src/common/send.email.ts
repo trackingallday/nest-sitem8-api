@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer';
-import base64Img from 'base64-img';
+import * as nodemailer from 'nodemailer';
+import * as base64Img from 'base64-img';
 import constants from '../constants';
 
 const { gmail } = constants;

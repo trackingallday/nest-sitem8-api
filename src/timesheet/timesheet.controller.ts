@@ -130,10 +130,10 @@ export class TimesheetController {
     return retvals;
   }
 
-  @Get('unlockedtimesheets')
+  /*@Get('unlockedtimesheets')
   async getUnlockedTimesheets(companyId: number): Promise<Timesheet[]> {
     // return await this.timesheetService.getUnlockedTimesheets(companyId);
-  }
+  }*/
 
   @Post('settimesheetstatus')
   async setTimesheetStatus(@Body() statusParams: any) {
@@ -170,9 +170,9 @@ export class TimesheetController {
   async exportTimesheet(@Param() id: number, @Param() companyId: number, @Param() timesheetFormat: number, @Param() timesheetStatus: number) {
    return await this.timesheetService.exportTimesheets(id, companyId, timesheetFormat, timesheetStatus);
   }
-
+/*
   @Get('locktimesheets/:id')
   async lockTimesheets(@Param() id: number, @Param() companyId: number) {
     return await this.timesheetService.LockTimesheets([id], companyId);
-  }
+  }*/
 }

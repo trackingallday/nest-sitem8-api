@@ -13,7 +13,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { isNil, isEmpty, groupBy, forOwn, minBy, maxBy, join, sumBy, invert } from 'lodash';
 import { TimesheetEntry } from '../timesheetEntry/timesheetEntry.entity';
 import { Site } from '../site/site.entity';
-import { Parser } from 'json2csv';
+import * as  Parser from 'json2csv';
 
 @Injectable()
 export class TimesheetService {
