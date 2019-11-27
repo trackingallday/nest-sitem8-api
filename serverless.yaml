@@ -1,0 +1,43 @@
+service: serverless-nestjs
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-warmup
+
+package:
+  exclude:
+    - .git/**
+    - src/**
+    - test/**
+    - e2e/**
+    - nodemon.json
+    - README.md
+
+functions:
+  index:
+    warmup: true
+    timeout: 20 # optional, in seconds, default is 6
+    handler: dist/index.handler
+    events:
+    - http:
+        cors: true
+        path: '/'
+        method: any
+    - http:
+        cors: true
+        path: '{proxy+}'
+        method: any
+    environment: 
+      NODE_ENV: dev
+      DBPROVIDE: SEQUELIZE
+      DBDIALECT: postgres
+      DBHOST: 'public-avail-sitem8-dev-instance-1.csojtpg6ojvo.ap-southeast-2.rds.amazonaws.com'
+      DBPORT: 5342
+      DBPOSTGRESUSERNAME: postgres
+      DBPASSWORD: MastersOfTheUniverse
+      DBPASSWORD22: SitemateMasterOfDevelopmentDatabase
+      DBDATABASE: devon

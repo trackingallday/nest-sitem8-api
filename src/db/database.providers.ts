@@ -17,7 +17,7 @@ import { WorkerAssignment } from '../workerAssignment/workerAssignment.entity';
 import { Company } from '../company/company.entity';
 
 const { DBDATABASE, DBPASSWORD, DBPROVIDE, DBPOSTGRESUSERNAME, DBDIALECT, DBHOST, DBPORT } = process.env;
-
+console.log(`new S${DBDATABASE}, ${DBPASSWORD}, ${DBPROVIDE}, ${DBPOSTGRESUSERNAME}, ${DBDIALECT}, ${DBHOST}, ${DBPORT}`);
 export const databaseProviders = [
   {
     provide: 'SEQUELIZE', // MUST BE A STRING AND NOT A VARIABLE OTHERWISE ERROR
@@ -25,6 +25,8 @@ export const databaseProviders = [
 
       const sequelize = new Sequelize(DBDATABASE, DBPOSTGRESUSERNAME, DBPASSWORD, {
         dialect: 'postgres',
+        host: DBHOST,
+        port: 5432,
         logging: false,
         dialectOptions: { decimalNumbers: true, useUTC: true },
         timezone: '+00:00',
